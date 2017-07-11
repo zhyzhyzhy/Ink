@@ -1,0 +1,34 @@
+package com.noname.ioc.bean;
+
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+
+/**
+ * Created by zhy on 4/14/17.
+ */
+public class BeanMetaDataResolver {
+    public BeanMetaData getBeanMetaData(Class<?> beanClass) {
+        BeanMetaData beanMetaData = new BeanMetaData();
+        beanMetaData.setBeanClass(beanClass);
+        beanMetaData.setAnnotations(getAnnotions(beanClass));
+        beanMetaData.setFields(getFields(beanClass));
+        return beanMetaData;
+    }
+    public Annotation[] getAnnotions(Class<?> beanClass) {
+        try {
+           return Class.forName(beanClass.getName()).getAnnotations();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    public Field[] getFields(Class<?> beanClass) {
+        try {
+            return Class.forName(beanClass.getName()).getDeclaredFields();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+}
