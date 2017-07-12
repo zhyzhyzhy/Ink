@@ -1,8 +1,6 @@
 package ioc;
 
-import com.noname.ioc.annotation.ComponentScan;
-import com.noname.ioc.context.AnnotationApplicationContext;
-import com.noname.ioc.context.ApplicationContext;
+import com.noname.ioc.context.IocContext;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -12,27 +10,24 @@ import org.junit.runners.JUnit4;
  */
 @RunWith(JUnit4.class)
 public class InjectTest {
-    @Test
-    public void IocTest() {
-        ApplicationContext applicationContext = new AnnotationApplicationContext(Configuration.class);
-        Boy boy = applicationContext.getBean(Boy.class);
-        Girl girl = applicationContext.getBean(Girl.class);
-        if (boy.getNioEventLoopGroup() == null) {
-            System.out.println("cdscdscds");
-        }
-        System.out.println(girl.getBoy());
-        System.out.println(boy.getGirl());
-    }
-    @Test
-    public void newInstance() throws IllegalAccessException, InstantiationException, ClassNotFoundException {
-        Class.forName("ioc.Boy").newInstance();
-    }
+//    @Test
+//    public void IocTest() {
+//        IocContext applicationContext = new IocContext(Configure.class);
+//        Boy boy = applicationContext.getBean(Boy.class);
+//        Girl girl = applicationContext.getBean(Girl.class);
+//        if (boy.getNioEventLoopGroup() == null) {
+//            System.out.println("cdscdscds");
+//        }
+//        System.out.println(girl.getBoy());
+//        System.out.println(boy.getGirl());
+//    }
+//    @Test
+//    public void newInstance() throws IllegalAccessException, InstantiationException, ClassNotFoundException {
+//        Class.forName("ioc.Boy").newInstance();
+//    }
 
 }
 
-@ComponentScan("ioc")
-class Configuration {
 
-}
 
 

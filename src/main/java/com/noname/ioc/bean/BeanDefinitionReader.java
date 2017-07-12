@@ -1,9 +1,13 @@
 package com.noname.ioc.bean;
 
 
+import com.noname.NoNameConfigure;
 import com.noname.ioc.annotation.Bean;
-import com.noname.ioc.annotation.ComponentScan;
+import com.noname.ioc.annotation.Component;
 import com.noname.ioc.annotation.Inject;
+import com.noname.web.annotation.Controller;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.annotation.Annotation;
@@ -21,6 +25,7 @@ public class BeanDefinitionReader {
     private BeanDefinitionRegister register;
     private BeanMetaDataResolver resolver = new BeanMetaDataResolver();
     private List<Class> classList = new ArrayList<Class>();
+    private final Logger log = LoggerFactory.getLogger(BeanDefinitionReader.class);
 
 
     public BeanDefinitionReader(BeanDefinitionRegister register) {
@@ -28,18 +33,23 @@ public class BeanDefinitionReader {
     }
 
     public void configure(Class<?> aclass) {
-        BeanMetaData metaData = getMetaData(aclass);
-        for (Annotation annotation : metaData.getAnnotations()) {
-            if (annotation instanceof ComponentScan) {
-                ComponentScan annotation1 = (ComponentScan)annotation;
-                addPackageToScan(annotation1.value()[0]);
+        try {
+            NoNameConfigure configure = (NoNameConfigure) aclass.newInstance();
+            this.register.registerBean(configure);
+            for (String beanPackage : configure.beansPackage()) {
+                log.info("package {} is being scan", beanPackage);
+                addPackageToScan(beanPackage);
             }
+            classList.add(aclass);
+            configureInjectField();
+        } catch (Exception e) {
+            log.error("class {} is not implements NoNameConfigure.class", aclass);
         }
-        classList.add(aclass);
-        configureInjectField();
     }
+
     public void configureInjectField() {
         for (Class class1 : classList) {
+            log.info("{} is being configure", class1);
             BeanMetaData metaData = getMetaData(class1);
             for (Field field : metaData.getFields()) {
                 Annotation[] annotations = field.getDeclaredAnnotations();
@@ -78,9 +88,12 @@ public class BeanDefinitionReader {
                     if (f.isDirectory()) {
                         addPackageToScan(pack + "/" + f.getName());
                     } else {
-                        if (Class.forName(pack + "." + f.getName().replace(".class", "")).getAnnotation(Bean.class) != null) {
-                            classList.add(Class.forName(pack + "." + f.getName().replace(".class", "")));
-                            this.register.registerBean(Class.forName(pack + "." + f.getName().replace(".class", "")).newInstance());
+                        Class<?> class1 = Class.forName(pack + "." + f.getName().replace(".class", ""));
+                        if (class1.getAnnotation(Component.class) != null
+                                || class1.getAnnotation(Controller.class) != null) {
+                            classList.add(class1);
+                            this.register.registerBean(class1.newInstance());
+                            log.info("register bean {}", class1);
                         }
                     }
                 }
@@ -89,4 +102,5 @@ public class BeanDefinitionReader {
             e.printStackTrace();
         }
     }
+
 }

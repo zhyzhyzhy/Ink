@@ -1,13 +1,14 @@
 package ioc;
 
 import com.noname.ioc.annotation.Bean;
+import com.noname.ioc.annotation.Component;
 import com.noname.ioc.annotation.Inject;
 
 /**
  * Created by zhuyichen on 2017/7/11.
  */
 
-@Bean
+@Component
 public class Girl {
     @Inject
     private Boy boy;

@@ -1,5 +1,7 @@
 package com.noname.ioc.bean;
 
+import java.util.Collections;
+
 /**
  * Created by zhy on 2017/4/9.
  */
@@ -7,6 +9,7 @@ public class BeanDefinition {
     private String beanName;
     private Class beanClassName;
     private Object object;
+    private boolean isSingleton = false;
 
     public BeanDefinition() {
 

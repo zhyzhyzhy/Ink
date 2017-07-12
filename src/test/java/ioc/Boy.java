@@ -1,6 +1,7 @@
 package ioc;
 
 import com.noname.ioc.annotation.Bean;
+import com.noname.ioc.annotation.Component;
 import com.noname.ioc.annotation.Inject;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -8,7 +9,7 @@ import io.netty.channel.nio.NioEventLoopGroup;
 /**
  * Created by zhuyichen on 2017/7/11.
  */
-@Bean
+@Component
 public class Boy {
     @Inject
     private Girl girl;

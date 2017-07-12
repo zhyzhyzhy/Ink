@@ -10,6 +10,6 @@ import org.junit.runners.JUnit4;
 public class NoNameTest {
     @Test
     public void start() throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        NoName.NoName(8091).start();
+        new NoName(8091, Configure.class).start();
     }
 }

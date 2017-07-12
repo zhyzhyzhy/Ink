@@ -1,5 +1,7 @@
 package com.noname.ioc.bean;
 
+import com.noname.ioc.annotation.Bean;
+
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -39,6 +41,14 @@ public class BeanFactory implements BeanDefinitionRegister {
             }
         }
         return null;
+    }
+
+    public Map<String, BeanDefinition> getDefinitions() {
+        return container;
+    }
+
+    public Map<String, BeanDefinition> getContainer() {
+        return container;
     }
 
 }
