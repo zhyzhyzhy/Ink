@@ -2,6 +2,7 @@ package com.noname.server.netty;
 
 import com.alibaba.fastjson.JSON;
 import com.noname.web.route.Route;
+import com.noname.web.route.RouteFinder;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -37,15 +38,17 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             Object message = null;
             System.out.println(fullHttpRequest.content().toString(CharsetUtil.UTF_8));
             log.info("request path {}", fullHttpRequest.uri());
-            for (Route router : list) {
-                if (router.getHttpMethod().equals(fullHttpRequest.method()) && router.getPath().equals(fullHttpRequest.uri())) {
-                    message = router.getMethod().invoke(router.getObject());
-                }
+
+            Route route = RouteFinder.findRoute(fullHttpRequest.uri(), fullHttpRequest.method());
+            System.out.println(route);
+            if (route != null) {
+                message = route.getMethod().invoke(route.getObject(),route.getParamters());
             }
+
             log.info("response message {}", message);
 
             if (message == null) {
-                FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, HttpResponseStatus.NOT_FOUND);
+                FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(page404(fullHttpRequest.uri()).getBytes()));
                 channelHandlerContext.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
             }
             else {
@@ -58,5 +61,8 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, HttpResponseStatus.NOT_FOUND);
             channelHandlerContext.writeAndFlush(response).addListener(ChannelFutureListener.CLOSE);
         }
+    }
+    public String page404(String url) {
+        return "<h1>URL [ " + url + " ] Not Found</h1>";
     }
 }

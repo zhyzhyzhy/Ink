@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.noname.ioc.annotation.Bean;
 import com.noname.web.annotation.Controller;
 import com.noname.web.annotation.GET;
+import com.noname.web.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -42,4 +43,14 @@ public class HelloController {
             add(new User("maoshumin","hello","cdscds"));
         }};
     }
+    @GET("/love/{id}")
+    public Map<String, String> testPath(@PathVariable String id) {
+        return Collections.singletonMap("hello", id);
+    }
+    @GET("/index/{id}/{name}")
+    public Map<String, String> testPath2(@PathVariable String id,
+                                         @PathVariable String name) {
+        return Collections.singletonMap("hello", id + "  " + name);
+    }
+
 }

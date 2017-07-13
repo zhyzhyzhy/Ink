@@ -14,6 +14,20 @@ public class Route {
     private HttpMethod httpMethod;
     private String path;
 
+    public void setMethod(Method method) {
+        this.method = method;
+    }
+
+    public Object[] getParamters() {
+        return paramters;
+    }
+
+    public void setParamters(Object[] paramters) {
+        this.paramters = paramters;
+    }
+
+    private Object[] paramters;
+
     public Route(Object object, Method method, HttpMethod httpMethod, String path) {
         this.object = object;
         this.method = method;

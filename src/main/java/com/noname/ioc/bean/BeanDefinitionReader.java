@@ -24,7 +24,7 @@ public class BeanDefinitionReader {
 
     private BeanDefinitionRegister register;
     private BeanMetaDataResolver resolver = new BeanMetaDataResolver();
-    private List<Class> classList = new ArrayList<Class>();
+    private List<Class> classList = new ArrayList<>();
     private final Logger log = LoggerFactory.getLogger(BeanDefinitionReader.class);
 
 

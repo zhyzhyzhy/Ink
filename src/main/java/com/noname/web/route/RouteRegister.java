@@ -36,6 +36,8 @@ public class RouteRegister {
                         }
                         else {
                             routes.add(route);
+                            route.setParamters(new Object[method.getParameterCount()]);
+                            RouteFinder.addRouter(RouteFinder.pathCompiler(((GET) annotation).value(), method), route);
                         }
                         log.info("register route {}", route);
                     }
@@ -44,5 +46,6 @@ public class RouteRegister {
         }
         return routes;
     }
+
 
 }
