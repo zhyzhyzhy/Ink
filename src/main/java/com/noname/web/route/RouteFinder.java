@@ -5,13 +5,16 @@ package com.noname.web.route;
 import com.noname.web.annotation.GET;
 import com.noname.web.annotation.POST;
 import com.noname.web.annotation.PathVariable;
+import com.noname.web.annotation.RequestParam;
 import io.netty.handler.codec.http.HttpMethod;
+import io.netty.handler.codec.http.QueryStringDecoder;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -47,20 +50,26 @@ public class RouteFinder {
         routeMap.put(pattern,route);
     }
     public static Route findRoute(String path, HttpMethod method) {
+        int index = path.indexOf('?');
         for (Pattern pattern : routeMap.keySet()) {
-            if (pattern.matcher(path).matches()) {
+            if (pattern.matcher(path.substring(0,index)).matches()) {
                 if (routeMap.get(pattern).getHttpMethod().equals(method)) {
-                    routeParamtersSetter(path, routeMap.get(pattern));
+                    routePathParamtersSetter(path, routeMap.get(pattern));
+                    routePathParamsSetter(path, routeMap.get(pattern));
                     return routeMap.get(pattern);
                 }
             }
         }
         return null;
     }
-    public static void routeParamtersSetter(String path, Route route) {
+
+    //处理@PathVariable参数
+    public static void routePathParamtersSetter(String path, Route route) {
         Method method = route.getMethod();
         Annotation annotation = method.getAnnotations()[0];
         String uri = "";
+
+
         if (annotation instanceof GET) {
             uri = ((GET)annotation).value();
         }
@@ -77,6 +86,28 @@ public class RouteFinder {
                 for (int j = 0; j < parameters.length; j++) {
                     if (parameters[j].getName().equals(originPath[i].substring(1, originPath[i].length() - 1))) {
                         route.getParamters()[j] = requestPaths[i];
+                    }
+                }
+            }
+        }
+    }
+
+    //处理@RequestParam参数
+    public static void routePathParamsSetter(String path, Route route) {
+        QueryStringDecoder decoder = new QueryStringDecoder(path);
+        Map<String, List<String>> map = decoder.parameters();
+        Parameter[] parameters = route.getMethod().getParameters();
+
+        for (int i = 0; i < parameters.length; i++) {
+            Annotation[] annotations = parameters[i].getAnnotations();
+            for (Annotation annotation : annotations) {
+                if (annotation instanceof RequestParam) {
+                    List<String> list = map.get(parameters[i].getName());
+                    if (list == null || list.size() == 0) {
+                        route.getParamters()[i] = null;
+                    }
+                    else {
+                        route.getParamters()[i] = list.get(0);
                     }
                 }
             }

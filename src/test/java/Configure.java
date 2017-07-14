@@ -9,7 +9,4 @@ public class Configure implements NoNameConfigure{
         return new String[]{"web"};
     }
 
-    public String getControllerPackage() {
-        return null;
-    }
 }

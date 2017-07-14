@@ -28,7 +28,7 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
                 new HttpServerExpectContinueHandler(),
                 new HttpObjectAggregator(Integer.MAX_VALUE),
                 new ChunkedWriteHandler(),
-                new HttpRequestHandler(list)
+                new HttpRequestHandler()
         );
     }
 }

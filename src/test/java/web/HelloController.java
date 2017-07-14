@@ -5,6 +5,9 @@ import com.noname.ioc.annotation.Bean;
 import com.noname.web.annotation.Controller;
 import com.noname.web.annotation.GET;
 import com.noname.web.annotation.PathVariable;
+import com.noname.web.annotation.RequestParam;
+import com.noname.web.http.Response;
+import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,41 +19,17 @@ import java.util.Map;
  */
 @Controller
 public class HelloController {
-    @GET("/love")
-    public String getIndex() {
-        return "hello";
-    }
-    @GET("/index")
-    public Map<String, String> getLove() {
-        return Collections.singletonMap("message", "love");
-    }
-    @GET("/int")
-    public int getInt() {
-        return 2;
-    }
-    @GET("/person")
-    public User getUser1() {
-        return new User("maoshumin","hello","cdscds");
-    }
-    @GET("/person")
-    public User getUser() {
-        return new User("zhuyichen","hello","cdscds");
-    }
     @GET("/persons")
-    public List<User> getUsers() {
-        return new ArrayList<User>(){{
+    public Response getUsers() {
+        return new Response(new ArrayList<User>(){{
             add(new User("zhuyichen","hello","cdscds"));
             add(new User("maoshumin","hello","cdscds"));
-        }};
+        }}, HttpResponseStatus.OK);
     }
-    @GET("/love/{id}")
-    public Map<String, String> testPath(@PathVariable String id) {
-        return Collections.singletonMap("hello", id);
-    }
-    @GET("/index/{id}/{name}")
-    public Map<String, String> testPath2(@PathVariable String id,
-                                         @PathVariable String name) {
-        return Collections.singletonMap("hello", id + "  " + name);
-    }
+   @GET("/index")
+   public Response getIndex(@RequestParam String name,
+                            @RequestParam String password) {
+        return new Response(name + " " + password, HttpResponseStatus.OK);
+   }
 
 }

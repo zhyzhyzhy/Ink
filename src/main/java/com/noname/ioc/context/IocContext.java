@@ -1,6 +1,7 @@
 package com.noname.ioc.context;
 
 
+import com.noname.NoNameConfigure;
 import com.noname.ioc.bean.BeanDefinition;
 import com.noname.ioc.bean.BeanDefinitionReader;
 import com.noname.ioc.bean.BeanDefinitionRegister;
@@ -21,9 +22,9 @@ public class IocContext implements BeanDefinitionRegister {
         beanDefinitionReader = new BeanDefinitionReader(this);
     }
 
-    public IocContext(Class<?> configurationClass) {
+    public IocContext(Class<?> configure) {
         this();
-        beanDefinitionReader.configure(configurationClass);
+        beanDefinitionReader.configure(configure);
     }
 
 
