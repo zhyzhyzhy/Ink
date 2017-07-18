@@ -4,11 +4,21 @@ import java.util.Collections;
 
 /**
  * Created by zhy on 2017/4/9.
+ *
+ * 存取一个bean的信息
  */
 public class BeanDefinition {
+
+    //bean名字
     private String beanName;
+
+    //bean的实际class
     private Class beanClassName;
+
+    //bean的实例
     private Object object;
+
+    //是否是单例的
     private boolean isSingleton = false;
 
     public BeanDefinition() {

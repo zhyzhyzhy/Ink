@@ -1,6 +1,7 @@
 package com.noname.ioc.bean;
 
 
+import com.noname.NoName;
 import com.noname.NoNameConfigure;
 import com.noname.ioc.annotation.Bean;
 import com.noname.ioc.annotation.Component;
@@ -19,6 +20,8 @@ import java.util.List;
 
 /**
  * Created by zhy on 4/14/17.
+ *
+ * 用于读取bean的信息
  */
 public class BeanDefinitionReader {
 
@@ -32,18 +35,21 @@ public class BeanDefinitionReader {
         this.register = register;
     }
 
-    public void configure(Class<?> aclass) {
+    public void configure(Class<?> configureClass) {
         try {
-            NoNameConfigure configure = (NoNameConfigure) aclass.newInstance();
-            this.register.registerBean(configure);
+            Object object = configureClass.newInstance();
+            this.register.registerBean(configureClass.newInstance());
+            NoNameConfigure configure = (NoNameConfigure)object;
             for (String beanPackage : configure.beansPackage()) {
                 log.info("package {} is being scan", beanPackage);
                 addPackageToScan(beanPackage);
             }
-            classList.add(aclass);
-            configureInjectField();
         } catch (Exception e) {
-            log.error("class {} is not implements NoNameConfigure.class", aclass);
+            log.info("class {} did't implements NoNameConfigure.class", configureClass);
+        } finally {
+
+            classList.add(configureClass);
+            configureInjectField();
         }
     }
 
@@ -56,11 +62,16 @@ public class BeanDefinitionReader {
                 for ( Annotation annotation : annotations) {
                     if (annotation instanceof Inject) {
                         try {
+
                             field.setAccessible(true);
+                            //先从containner中寻找bean
                             Object object = this.register.getBean(Class.forName(field.getGenericType().toString().split(" ")[1]));
+
+                            //如果没找到，则new一个
                             if (object == null) {
                                 object = Class.forName(field.getGenericType().toString().split(" ")[1]).newInstance();
                             }
+
                             field.set(this.register.getBean(class1), object);
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -75,19 +86,24 @@ public class BeanDefinitionReader {
     private BeanMetaData getMetaData(Class<?> beanClass) {
         return resolver.getBeanMetaData(beanClass);
     }
+
     private void addPackageToScan(String pack) {
         try {
             Enumeration<URL> resources = Thread.currentThread()
                     .getContextClassLoader()
                     .getResources(pack.replace(".", "/"));
+
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
                 File file = new File(resource.getPath());
-                File[] files = file.listFiles();
-                for (File f : files) {
+
+                for (File f : file.listFiles()) {
+
+                    //如果还是个包，则继续扫描
                     if (f.isDirectory()) {
                         addPackageToScan(pack + "/" + f.getName());
-                    } else {
+                    }
+                    else {
                         Class<?> class1 = Class.forName(pack + "." + f.getName().replace(".class", ""));
                         if (class1.getAnnotation(Component.class) != null
                                 || class1.getAnnotation(Controller.class) != null) {

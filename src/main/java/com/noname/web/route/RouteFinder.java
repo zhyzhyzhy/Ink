@@ -23,8 +23,11 @@ import java.util.regex.Pattern;
  * Created by zhuyichen on 2017/7/12.
  */
 public class RouteFinder {
-    private static Map<Pattern, Route> routeMap = new HashMap<>();
 
+    //保存路由参数的Pattern和路由的map
+    private static final Map<Pattern, Route> routeMap = new HashMap<>();
+
+    //根据参数进行正则替换
     public static Pattern pathCompiler(String path, Method method) {
         Parameter[] parameters = method.getParameters();
         for (Parameter parameter : parameters) {
@@ -33,9 +36,11 @@ public class RouteFinder {
             }
             Annotation annotation = parameter.getAnnotations()[0];
             if (annotation instanceof PathVariable) {
+                //如果是字符串
                 if (parameter.getType() == String.class) {
                     path = path.replace("{" + parameter.getName()+"}","[0-9\\d\\D]*");
                 }
+                //如果是数字
                 else if (parameter.getType() == Integer.class
                         || parameter.getType() == Long.class) {
 
@@ -80,7 +85,7 @@ public class RouteFinder {
                     routePathParamsSetter(path, route);
 
                     //设置@RequestJson
-                    if (fullHttpRequest.headers().get("content-Type").equals("application/json")) {
+                    if ("application/json".equals(fullHttpRequest.headers().get("content-Type"))) {
                         routeRequestJsonSetter(fullHttpRequest.content().copy().toString(CharsetUtil.UTF_8), route);
                     }
 
@@ -99,8 +104,9 @@ public class RouteFinder {
             Annotation[] annotations = parameters[i].getAnnotations();
             for (Annotation annotation : annotations) {
                 if (annotation instanceof RequestJson) {
+                    //得到参数的类
                     Class<?> class1 = parameters[i].getType();
-                    System.out.println(class1.getName());
+
                     Object object = JSON.parseObject(json, class1);
                     route.getParamters()[i] = object;
                 }
@@ -119,15 +125,22 @@ public class RouteFinder {
         if (annotation instanceof GET) {
             uri = ((GET)annotation).value();
         }
-        if (annotation instanceof POST) {
+        else if (annotation instanceof POST) {
             uri = ((POST)annotation).value();
         }
+        else if (annotation instanceof PUT) {
+            uri = ((PUT)annotation).value();
+        }
+        else if (annotation instanceof DELETE) {
+            uri = ((DELETE)annotation).value();
+        }
+
         String[] requestPaths = path.split("/");
         String[] originPath = uri.split("/");
 
         Parameter[] parameters = method.getParameters();
 
-        for (int i = 0; i < requestPaths.length; i++) {
+        for (int i = 0; i < originPath.length; i++) {
             if (!requestPaths[i].equals(originPath[i])) {
                 for (int j = 0; j < parameters.length; j++) {
                     if (parameters[j].getName().equals(originPath[i].substring(1, originPath[i].length() - 1))) {
@@ -140,6 +153,7 @@ public class RouteFinder {
 
     //处理@RequestParam参数
     public static void routePathParamsSetter(String path, Route route) {
+
         QueryStringDecoder decoder = new QueryStringDecoder(path);
         Map<String, List<String>> map = decoder.parameters();
         Parameter[] parameters = route.getMethod().getParameters();

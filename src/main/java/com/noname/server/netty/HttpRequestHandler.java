@@ -40,18 +40,15 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             return;
         }
 
-        log.info("request {}", fullHttpRequest.uri());
+        log.info("Request [{}]", fullHttpRequest.uri());
 
         Response message = null;
-
-        System.out.println(fullHttpRequest.content().copy().toString(CharsetUtil.UTF_8));
 
         Route route = RouteFinder.findRoute(fullHttpRequest);
 
         if (route != null) {
-            log.info("handle route {}", route.getPath());
             message = (Response)route.getMethod().invoke(route.getObject(), route.getParamters());
-            log.info("response message {}", message.getResponseEntity());
+            log.info("Response {{}}", message.getResponseEntity());
         }
 
         if (message == null) {

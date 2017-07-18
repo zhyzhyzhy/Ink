@@ -1,6 +1,7 @@
 package web;
 
 import com.alibaba.fastjson.JSON;
+import com.noname.NoName;
 import com.noname.ioc.annotation.Bean;
 import com.noname.web.annotation.*;
 import com.noname.web.http.Response;
@@ -34,5 +35,9 @@ public class HelloController {
     public Response newPerson(@RequestJson User user) {
         System.out.println(user);
         return new Response.Builder().build();
+    }
+
+    public static void main(String[] args) {
+        new NoName(8091, HelloController.class).start();
     }
 }

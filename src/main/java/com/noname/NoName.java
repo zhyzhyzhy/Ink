@@ -18,7 +18,7 @@ public class NoName {
     public NoName(int port, Class<?> configure) {
         noNameServer = new NoNameServer(port);
         iocContext = new IocContext(configure);
-        routes = RouteRegister.registRoute(iocContext.getDefinitions());
+        routes = RouteRegister.registerRoute(iocContext.getDefinitions());
         noNameServer.setList(routes);
     }
     public void start() {

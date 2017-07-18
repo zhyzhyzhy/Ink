@@ -8,5 +8,4 @@ public class Configure implements NoNameConfigure{
     public String[] beansPackage() {
         return new String[]{"web"};
     }
-
 }
