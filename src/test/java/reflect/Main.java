@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.Arrays;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -27,5 +28,7 @@ class Demo {
         String test = "/love/cdcd";
         Pattern pattern = Pattern.compile("/love/[0-9\\d\\D]*");
         System.out.println(pattern.matcher(test).matches());
+        List<String> list = new LinkedList<>();
+
     }
 }

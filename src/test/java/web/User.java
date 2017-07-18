@@ -8,6 +8,8 @@ public class User {
     private String password;
     private String phoneNumber;
 
+    public User(){}
+
     public User(String userName, String password, String phoneNumber) {
         this.userName = userName;
         this.password = password;
@@ -36,5 +38,15 @@ public class User {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("User{");
+        sb.append("userName='").append(userName).append('\'');
+        sb.append(", password='").append(password).append('\'');
+        sb.append(", phoneNumber='").append(phoneNumber).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

@@ -41,6 +41,18 @@ public class RouteRegister {
                         }
                         log.info("register route {}", route);
                     }
+                    else if (annotation instanceof POST) {
+                        Route route = new Route(beanDefinition.getObject(), method, HttpMethod.POST,((POST) annotation).value());
+                        if (routes.contains(route)) {
+                            log.error("route {} has contained", route);
+                        }
+                        else {
+                            routes.add(route);
+                            route.setParamters(new Object[method.getParameterCount()]);
+                            RouteFinder.addRouter(RouteFinder.pathCompiler(((POST) annotation).value(), method), route);
+                        }
+                        log.info("register route {}", route);
+                    }
                 }
             }
         }

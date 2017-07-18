@@ -24,14 +24,14 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     private final Logger log = LoggerFactory.getLogger(HttpRequestHandler.class);
 
     public HttpRequestHandler() {
-        log.info("init handler");
+        log.info("init handler...");
     }
 
 
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.info("connect from {} ", ctx.channel().remoteAddress());
+
     }
 
 
@@ -40,10 +40,13 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             return;
         }
 
-        log.info("request path {}", fullHttpRequest.uri());
+        log.info("request {}", fullHttpRequest.uri());
 
         Response message = null;
-        Route route = RouteFinder.findRoute(fullHttpRequest.uri(), fullHttpRequest.method());
+
+        System.out.println(fullHttpRequest.content().copy().toString(CharsetUtil.UTF_8));
+
+        Route route = RouteFinder.findRoute(fullHttpRequest);
 
         if (route != null) {
             log.info("handle route {}", route.getPath());

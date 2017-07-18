@@ -2,10 +2,7 @@ package web;
 
 import com.alibaba.fastjson.JSON;
 import com.noname.ioc.annotation.Bean;
-import com.noname.web.annotation.Controller;
-import com.noname.web.annotation.GET;
-import com.noname.web.annotation.PathVariable;
-import com.noname.web.annotation.RequestParam;
+import com.noname.web.annotation.*;
 import com.noname.web.http.Response;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -21,15 +18,21 @@ import java.util.Map;
 public class HelloController {
     @GET("/persons")
     public Response getUsers() {
-        return new Response(new ArrayList<User>(){{
-            add(new User("zhuyichen","hello","cdscds"));
-            add(new User("maoshumin","hello","cdscds"));
-        }}, HttpResponseStatus.OK);
+        return new Response.Builder().entity(new ArrayList<User>() {{
+            add(new User("zhuyichen", "hello", "cdscds"));
+            add(new User("maoshumin", "hello", "cdscds"));
+        }}).status(HttpResponseStatus.OK).build();
     }
-   @GET("/index")
-   public Response getIndex(@RequestParam String name,
-                            @RequestParam String password) {
-        return new Response(name + " " + password, HttpResponseStatus.OK);
-   }
 
+    @GET("/index")
+    public Response getIndex(@RequestParam String name,
+                             @RequestParam String password) {
+        return new Response.Builder().entity(name + " " + password).status(HttpResponseStatus.OK).build();
+    }
+
+    @POST("/new")
+    public Response newPerson(@RequestJson User user) {
+        System.out.println(user);
+        return new Response.Builder().build();
+    }
 }

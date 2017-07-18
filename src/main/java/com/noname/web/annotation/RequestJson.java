@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Created by zhuyichen on 2017/7/13.
+ * Created by zhuyichen on 2017/7/18.
  */
 @Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RequestParam {
+public @interface RequestJson {
 
 }
