@@ -5,6 +5,7 @@ import com.noname.web.http.Response;
 import com.noname.web.route.Route;
 import com.noname.web.route.RouteFinder;
 import io.netty.buffer.Unpooled;
+import io.netty.buffer.UnpooledDirectByteBuf;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -47,19 +48,38 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         Route route = RouteFinder.findRoute(fullHttpRequest);
 
         if (route != null) {
-            message = (Response)route.getMethod().invoke(route.getObject(), route.getParamters());
+            Object o = route.getMethod().invoke(route.getObject(), route.getParamters());
+            if (o instanceof Response) {
+                message = (Response)o;
+            }
+            else {
+                message = Response.ok().body(o).build();
+            }
             log.info("Response {{}}", message.getResponseEntity());
         }
 
         if (message == null) {
+
             FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(page404(fullHttpRequest.uri()).getBytes()));
             channelHandlerContext.write(response);
+
+
         } else {
-            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, HttpResponseStatus.OK, Unpooled.wrappedBuffer(JSON.toJSONString(message.getResponseEntity()).getBytes()));
+            FullHttpResponse response = processResponse(message);
             response.headers().set("Content-Type", "application/json");
             channelHandlerContext.write(response);
         }
 
+    }
+
+    public FullHttpResponse processResponse(Response response) {
+
+        if (response.getResponseEntity() == null) {
+            return new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, response.getResponseStatus());
+        }
+        else {
+            return new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, response.getResponseStatus(), Unpooled.copiedBuffer(JSON.toJSONString(response.getResponseEntity()).getBytes()));
+        }
     }
 
     @Override

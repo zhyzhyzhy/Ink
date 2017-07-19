@@ -144,7 +144,16 @@ public class RouteFinder {
             if (!requestPaths[i].equals(originPath[i])) {
                 for (int j = 0; j < parameters.length; j++) {
                     if (parameters[j].getName().equals(originPath[i].substring(1, originPath[i].length() - 1))) {
-                        route.getParamters()[j] = requestPaths[i];
+                        //根据@PathVariable的类型进行转换
+                        if (parameters[j].getType().equals(Integer.class)) {
+                            route.getParamters()[j] = Integer.valueOf(requestPaths[i]);
+                        }
+                        else if(parameters[j].getType().equals(Long.class)) {
+                            route.getParamters()[j] = Long.valueOf(requestPaths[i]);
+                        }
+                        else if(parameters[j].getType().equals(String.class)) {
+                            route.getParamters()[j] = requestPaths[i];
+                        }
                     }
                 }
             }

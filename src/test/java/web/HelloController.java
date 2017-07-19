@@ -18,23 +18,38 @@ import java.util.Map;
 @Controller
 public class HelloController {
     @GET("/persons")
-    public Response getUsers() {
-        return new Response.Builder().entity(new ArrayList<User>() {{
+    public List<User> getUsers() {
+        return new ArrayList<User>() {{
             add(new User("zhuyichen", "hello", "cdscds"));
             add(new User("maoshumin", "hello", "cdscds"));
-        }}).status(HttpResponseStatus.OK).build();
+        }};
     }
 
     @GET("/index")
     public Response getIndex(@RequestParam String name,
                              @RequestParam String password) {
-        return new Response.Builder().entity(name + " " + password).status(HttpResponseStatus.OK).build();
+        return Response.status(HttpResponseStatus.OK).build();
     }
 
     @POST("/new")
     public Response newPerson(@RequestJson User user) {
         System.out.println(user);
-        return new Response.Builder().build();
+        return Response.status(HttpResponseStatus.OK).build();
+    }
+
+    @GET("/{id}")
+    public Response getId(@PathVariable Long id) {
+        return Response.status(HttpResponseStatus.OK).body(id).build();
+    }
+
+    @GET("/time")
+    public Response getTime() {
+        return Response.status(HttpResponseStatus.OK).build();
+    }
+
+    @GET("/test")
+    public Response gettest() {
+        return Response.badRequest().build();
     }
 
     public static void main(String[] args) {
