@@ -1,22 +1,17 @@
-package web;
+package example1;
 
 import com.noname.NoName;
-import com.noname.security.annotation.Role;
 import com.noname.web.annotation.*;
 import com.noname.web.http.Response;
-import domain.User;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-/**
- * Created by zhuyichen on 2017/7/12.
- */
 @Controller
 public class HelloController {
 
-    @Role("ADMIN")
     @GET("/persons")
     public List<User> getUsers() {
         return new ArrayList<User>() {{
@@ -28,7 +23,7 @@ public class HelloController {
     @GET("/index")
     public Response getIndex(@RequestParam String name,
                              @RequestParam String password) {
-        return Response.status(HttpResponseStatus.OK).build();
+        return Response.status(HttpResponseStatus.OK).body(Collections.singletonMap(name, password)).build();
     }
 
     @POST("/new")
@@ -37,20 +32,12 @@ public class HelloController {
         return Response.status(HttpResponseStatus.OK).build();
     }
 
-    @GET("/{id}")
+    @GET("/user/{id}")
     public Response getId(@PathVariable Long id) {
         return Response.status(HttpResponseStatus.OK).body(id).build();
     }
 
-    @GET("/time")
-    public Response getTime() {
-        return Response.status(HttpResponseStatus.OK).build();
-    }
 
-    @GET("/test")
-    public Response gettest() {
-        return Response.badRequest().build();
-    }
 
     public static void main(String[] args) {
         new NoName(8091, HelloController.class).start();

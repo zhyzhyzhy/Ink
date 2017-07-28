@@ -76,6 +76,7 @@ public class RouteFinder {
         for (Pattern pattern : routeMap.keySet()) {
             //如果找到uri匹配的
             if (pattern.matcher(path.substring(0, splitIndex)).matches()) {
+
                 Route route = routeMap.get(pattern);
                 //如果请求方式一样
                 if (route.getHttpMethod().equals(method)) {
@@ -146,7 +147,7 @@ public class RouteFinder {
 
         Parameter[] parameters = method.getParameters();
 
-        for (int i = 0; i < originPath.length; i++) {
+        for (int i = 0; i < requestPaths.length && i < originPath.length; i++) {
             if (!requestPaths[i].equals(originPath[i])) {
                 for (int j = 0; j < parameters.length; j++) {
                     if (parameters[j].getName().equals(originPath[i].substring(1, originPath[i].length() - 1))) {

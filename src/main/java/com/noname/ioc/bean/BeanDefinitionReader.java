@@ -48,7 +48,6 @@ public class BeanDefinitionReader {
         } catch (Exception e) {
             log.info("class {} did't implements NoNameConfigure.class", configureClass);
         } finally {
-
             classList.add(configureClass);
             configureInjectField();
         }
@@ -63,7 +62,6 @@ public class BeanDefinitionReader {
                 for ( Annotation annotation : annotations) {
                     if (annotation instanceof Inject) {
                         try {
-
                             field.setAccessible(true);
                             //先从containner中寻找bean
                             Object object = this.register.getBean(Class.forName(field.getGenericType().toString().split(" ")[1]));
@@ -85,7 +83,9 @@ public class BeanDefinitionReader {
 
     }
     private BeanMetaData getMetaData(Class<?> beanClass) {
+
         return resolver.getBeanMetaData(beanClass);
+
     }
 
     private void addPackageToScan(String pack) {

@@ -20,10 +20,12 @@ public class NoName {
         noNameServer = new NoNameServer(port);
         iocContext = new IocContext(configure);
 
+        //get all Service info
+        SecurityManager.configure(iocContext, configure);
+
         //get all route info
         routes = RouteRegister.registerRoute(iocContext.getDefinitions());
-        //get all Service info
-        SecurityManager.getRoleServices(iocContext.getDefinitions());
+
 
         noNameServer.setList(routes);
     }

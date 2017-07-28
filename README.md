@@ -11,8 +11,8 @@ package web;
 import com.alibaba.fastjson.JSON;
 import com.noname.NoName;
 import com.noname.ioc.annotation.Bean;
-import com.noname.web.annotation.*;
-import com.noname.web.http.Response;
+import com.noname.example2.service.web.annotation.*;
+import com.noname.example2.service.web.http.Response;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.ArrayList;
@@ -45,7 +45,7 @@ public class HelloController {
         return Response.status(HttpResponseStatus.OK).build();
     }
 
-    @GET("/{id}")
+    @GET("/user/{id}")
     public Response getId(@PathVariable Long id) {
         return Response.status(HttpResponseStatus.OK).body(id).build();
     }

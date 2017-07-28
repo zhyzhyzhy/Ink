@@ -1,7 +1,7 @@
-<!DOCTYPE web-app PUBLIC
+<!DOCTYPE example2.service.web-app PUBLIC
  "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
- "http://java.sun.com/dtd/web-app_2_3.dtd" >
+ "http://java.sun.com/dtd/example2.service.web-app_2_3.dtd" >
 
-<web-app>
+<example2.service.web-app>
   <display-name>Archetype Created Web Application</display-name>
-</web-app>
+</example2.service.web-app>

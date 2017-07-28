@@ -1,11 +1,27 @@
 package com.noname.security;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class User {
     private String userName;
     private String password;
-    private String[] roles;
+    private List<String> roles;
 
-    public User(String userName, String password, String[] roles) {
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
+
+    public User() {}
+    public User(String userName, String password, List<String> roles) {
         this.userName = userName;
         this.password = password;
         this.roles = roles;
@@ -19,7 +35,7 @@ public class User {
         return password;
     }
 
-    public String[] getRoles() {
+    public List<String> getRoles() {
         return roles;
     }
 }

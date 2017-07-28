@@ -27,7 +27,6 @@ public class IocContext implements BeanDefinitionRegister {
         beanDefinitionReader.configure(configure);
     }
 
-
     public void registerBean(String name, Object object) {
         beanFactory.registerBean(name, object);
     }

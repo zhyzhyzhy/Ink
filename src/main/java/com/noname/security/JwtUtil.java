@@ -2,17 +2,25 @@ package com.noname.security;
 
 import io.jsonwebtoken.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class JwtUtil {
-    public static String getIdFromToken(String jws) {
-        return (String) Jwts.parser()
+    public static User getUserFromToken(String jws) {
+        User user = new User();
+        Jws<Claims> claimsJws = Jwts.parser()
                 .setSigningKey(SecurityConfig.KEY)
-                .parseClaimsJws(jws).getBody().get("id");
+                .parseClaimsJws(jws);
+
+        user.setUserName((String) claimsJws.getBody().get("sub"));
+        user.setRoles((List<String>) claimsJws.getBody().get("roles"));
+        return user;
     }
-    public static String generateToken(String id) {
+    public static String generateToken(User user) {
         return Jwts.builder()
-                .claim("id", id)
+                .claim("sub", user.getUserName())
+                .claim("roles", user.getRoles())
                 .setExpiration(new Date(System.currentTimeMillis() + 604800))
                 .signWith(SignatureAlgorithm.HS256, SecurityConfig.KEY)
                 .compact();
@@ -22,12 +30,11 @@ public class JwtUtil {
             Jws<Claims> claimsJws = Jwts.parser()
                     .setSigningKey(SecurityConfig.KEY)
                     .parseClaimsJws(jws);
-            System.out.println(System.currentTimeMillis());
-            System.out.println(claimsJws.getBody().getExpiration().getTime());
-            if (System.currentTimeMillis() > claimsJws.getBody().getExpiration().getTime()) {
-                return false;
-            }
-        }catch (JwtException | NullPointerException e) {
+//            System.out.println(System.currentTimeMillis());
+//            System.out.println(claimsJws.getBody().getExpiration().getTime());
+        } catch (JwtException | NullPointerException e) {
+            e.printStackTrace();
+            //error or just out of time
             return false;
         }
         return true;

@@ -5,10 +5,15 @@ package com.noname;
  */
 
 public abstract class NoNameConfigure {
+
     public abstract String[] beansPackage();
 
     //jwt的key
     public String SecurityKey() {
         return "Love";
+    }
+
+    public boolean anthenticationOpen() {
+        return false;
     }
 }
