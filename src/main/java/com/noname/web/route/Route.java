@@ -14,6 +14,18 @@ public class Route {
     private HttpMethod httpMethod;
     private String path;
 
+    private boolean security = false;
+
+    public boolean isSecurity() {
+        return security;
+    }
+
+    public void setSecurity(boolean security) {
+        this.security = security;
+    }
+
+
+
     public void setMethod(Method method) {
         this.method = method;
     }

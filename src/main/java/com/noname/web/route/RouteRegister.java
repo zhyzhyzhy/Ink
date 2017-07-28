@@ -1,6 +1,7 @@
 package com.noname.web.route;
 
 import com.noname.ioc.bean.BeanDefinition;
+import com.noname.security.annotation.Role;
 import com.noname.web.annotation.DELETE;
 import com.noname.web.annotation.GET;
 import com.noname.web.annotation.POST;
@@ -41,13 +42,14 @@ public class RouteRegister {
 
                 Annotation[] annotations = method.getDeclaredAnnotations();
 
+                Route route = null;
+                String path = "";
+                boolean isSecurity = false;
                 for (Annotation annotation : annotations) {
 
                     method.setAccessible(true);
 
                     //没想到优化方法。。。暂时先这样了
-                    Route route = null;
-                    String path = "";
 
                     if (annotation instanceof GET) {
                         route = new Route(beanDefinition.getObject(), method, HttpMethod.GET, ((GET) annotation).value());
@@ -66,19 +68,34 @@ public class RouteRegister {
                         path = ((DELETE) annotation).value();
                     }
 
-                    if (route == null) {
-                        continue;
+
+                    if (annotation instanceof Role) {
+                        isSecurity = true;
                     }
 
-                    //如果已经有这个路由
-                    if (routes.contains(route)) {
-                        log.error("route {} has contained", route.getPath());
+                }
+
+
+                if (route == null) {
+                    continue;
+                }
+
+                //如果已经有这个路由
+                if (routes.contains(route)) {
+                    log.error("route {} has contained", route.getPath());
+                }
+                else {
+
+                    route.setSecurity(isSecurity);
+
+                    routes.add(route);
+                    route.setParamters(new Object[method.getParameterCount()]);
+                    RouteFinder.addRouter(RouteFinder.pathCompiler(path, method), route);
+                    if (route.isSecurity()) {
+                        log.info("mapping {} [{}] with roles [{}]", route.getHttpMethod(), route.getPath(), method.getAnnotation(Role.class).value());
                     }
                     else {
-                        routes.add(route);
-                        route.setParamters(new Object[method.getParameterCount()]);
-                        RouteFinder.addRouter(RouteFinder.pathCompiler(path, method), route);
-                        log.info("mapping {} [{}]", route.getHttpMethod(), route.getPath());
+                        log.info("mapping {} [{}] with roles [all]", route.getHttpMethod(), route.getPath());
                     }
                 }
             }

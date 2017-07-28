@@ -1,9 +1,10 @@
 package com.noname.web.route;
 
 
-
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.noname.exception.UnauthorizedException;
+import com.noname.security.JwtInfo;
+import com.noname.security.SecurityManager;
 import com.noname.web.annotation.*;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
@@ -27,6 +28,7 @@ public class RouteFinder {
     //保存路由参数的Pattern和路由的map
     private static final Map<Pattern, Route> routeMap = new HashMap<>();
 
+
     //根据参数进行正则替换
     public static Pattern pathCompiler(String path, Method method) {
         Parameter[] parameters = method.getParameters();
@@ -38,13 +40,13 @@ public class RouteFinder {
             if (annotation instanceof PathVariable) {
                 //如果是字符串
                 if (parameter.getType() == String.class) {
-                    path = path.replace("{" + parameter.getName()+"}","[0-9\\d\\D]*");
+                    path = path.replace("{" + parameter.getName() + "}", "[0-9\\d\\D]*");
                 }
                 //如果是数字
                 else if (parameter.getType() == Integer.class
                         || parameter.getType() == Long.class) {
 
-                    path = path.replace("{" + parameter.getName()+"}","[0-9]*");
+                    path = path.replace("{" + parameter.getName() + "}", "[0-9]*");
                 }
 
             }
@@ -53,11 +55,11 @@ public class RouteFinder {
     }
 
     public static void addRouter(Pattern pattern, Route route) {
-        routeMap.put(pattern,route);
+        routeMap.put(pattern, route);
     }
 
 
-    public static Route findRoute(FullHttpRequest fullHttpRequest) {
+    public static Route findRoute(FullHttpRequest fullHttpRequest) throws UnauthorizedException {
 
         String path = fullHttpRequest.uri();
         HttpMethod method = fullHttpRequest.method();
@@ -77,6 +79,13 @@ public class RouteFinder {
                 Route route = routeMap.get(pattern);
                 //如果请求方式一样
                 if (route.getHttpMethod().equals(method)) {
+
+                    if (route.isSecurity()) {
+                        JwtInfo jwtInfo = SecurityManager.check(fullHttpRequest, route);
+                        if (!jwtInfo.isOk()) {
+                            throw new UnauthorizedException();
+                        }
+                    }
 
                     //设置@PathVariable
                     routePathVariableSetter(path, route);
@@ -123,16 +132,13 @@ public class RouteFinder {
 
 
         if (annotation instanceof GET) {
-            uri = ((GET)annotation).value();
-        }
-        else if (annotation instanceof POST) {
-            uri = ((POST)annotation).value();
-        }
-        else if (annotation instanceof PUT) {
-            uri = ((PUT)annotation).value();
-        }
-        else if (annotation instanceof DELETE) {
-            uri = ((DELETE)annotation).value();
+            uri = ((GET) annotation).value();
+        } else if (annotation instanceof POST) {
+            uri = ((POST) annotation).value();
+        } else if (annotation instanceof PUT) {
+            uri = ((PUT) annotation).value();
+        } else if (annotation instanceof DELETE) {
+            uri = ((DELETE) annotation).value();
         }
 
         String[] requestPaths = path.split("/");
@@ -147,11 +153,9 @@ public class RouteFinder {
                         //根据@PathVariable的类型进行转换
                         if (parameters[j].getType().equals(Integer.class)) {
                             route.getParamters()[j] = Integer.valueOf(requestPaths[i]);
-                        }
-                        else if(parameters[j].getType().equals(Long.class)) {
+                        } else if (parameters[j].getType().equals(Long.class)) {
                             route.getParamters()[j] = Long.valueOf(requestPaths[i]);
-                        }
-                        else if(parameters[j].getType().equals(String.class)) {
+                        } else if (parameters[j].getType().equals(String.class)) {
                             route.getParamters()[j] = requestPaths[i];
                         }
                     }
@@ -174,8 +178,7 @@ public class RouteFinder {
                     List<String> list = map.get(parameters[i].getName());
                     if (list == null || list.size() == 0) {
                         route.getParamters()[i] = null;
-                    }
-                    else {
+                    } else {
                         route.getParamters()[i] = list.get(0);
                     }
                 }

@@ -1,6 +1,7 @@
 package com.noname.server.netty;
 
 import com.alibaba.fastjson.JSON;
+import com.noname.exception.UnauthorizedException;
 import com.noname.web.http.Response;
 import com.noname.web.route.Route;
 import com.noname.web.route.RouteFinder;
@@ -24,11 +25,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     private final Logger log = LoggerFactory.getLogger(HttpRequestHandler.class);
 
-    public HttpRequestHandler() {
-        log.info("init handler...");
-    }
-
-
+    private final SecurityManager securityManager = new SecurityManager();
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -45,7 +42,14 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
         Response message = null;
 
-        Route route = RouteFinder.findRoute(fullHttpRequest);
+        Route route = null;
+        try {
+             route = RouteFinder.findRoute(fullHttpRequest);
+        } catch (UnauthorizedException ignored) {
+            HttpResponse request = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, HttpResponseStatus.UNAUTHORIZED);
+            channelHandlerContext.write(request);
+            return;
+        }
 
         if (route != null) {
             Object o = route.getMethod().invoke(route.getObject(), route.getParamters());

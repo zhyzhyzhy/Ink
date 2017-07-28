@@ -1,4 +1,5 @@
-package web;
+package domain;
+
 
 /**
  * Created by zhuyichen on 2017/7/12.
@@ -49,4 +50,6 @@ public class User {
         sb.append('}');
         return sb.toString();
     }
+
+
 }
