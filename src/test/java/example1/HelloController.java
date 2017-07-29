@@ -32,6 +32,12 @@ public class HelloController {
         return Response.status(HttpResponseStatus.OK).build();
     }
 
+    @POST("/postt")
+    public Response post(@RequestParam String name, @RequestParam String password) {
+        System.out.println(name);
+        System.out.println(password);
+        return Response.ok().build();
+    }
     @GET("/user/{id}")
     public Response getId(@PathVariable Long id) {
         return Response.status(HttpResponseStatus.OK).body(id).build();

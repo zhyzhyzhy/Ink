@@ -9,8 +9,13 @@ import com.noname.web.annotation.*;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.QueryStringDecoder;
+import io.netty.handler.codec.http.multipart.Attribute;
+import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
+import io.netty.handler.codec.http.multipart.InterfaceHttpData;
+import io.netty.handler.codec.http.multipart.MixedAttribute;
 import io.netty.util.CharsetUtil;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
@@ -91,8 +96,13 @@ public class RouteFinder {
                     //设置@PathVariable
                     routePathVariableSetter(path, route);
 
-                    //设置@PathParams
-                    routePathParamsSetter(path, route);
+                    if (route.getHttpMethod().equals(HttpMethod.GET)) {
+                        //设置GET @RequestParam
+                        GETParamsSetter(path, route);
+                    } else if (route.getHttpMethod().equals(HttpMethod.POST)) {
+                        //设置POST @RequestParam
+                        POSTParamsSetter(fullHttpRequest, route);
+                    }
 
                     //设置@RequestJson
                     if ("application/json".equals(fullHttpRequest.headers().get("content-Type"))) {
@@ -166,7 +176,7 @@ public class RouteFinder {
     }
 
     //处理@RequestParam参数
-    public static void routePathParamsSetter(String path, Route route) {
+    public static void GETParamsSetter(String path, Route route) {
 
         QueryStringDecoder decoder = new QueryStringDecoder(path);
         Map<String, List<String>> map = decoder.parameters();
@@ -187,4 +197,39 @@ public class RouteFinder {
         }
     }
 
+    //处理@POSTParam参数
+    public static void POSTParamsSetter(FullHttpRequest request, Route route) {
+        Parameter[] parameters = route.getMethod().getParameters();
+
+
+        HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(request);
+        List<InterfaceHttpData> interfaceHttpData = decoder.getBodyHttpDatas();
+
+        interfaceHttpData.stream()
+                .forEach(interfaceHttpData1 -> {
+                    //if is Attribute
+                    if (interfaceHttpData1.getHttpDataType().equals(InterfaceHttpData.HttpDataType.Attribute)) {
+
+                        Attribute attribute = (Attribute) interfaceHttpData1;
+
+                        for (int i = 0; i < parameters.length; i++) {
+                            Annotation[] annotations = parameters[i].getAnnotations();
+                            for (Annotation annotation : annotations) {
+                                if (annotation instanceof RequestParam) {
+                                    String parameterName = parameters[i].getName();
+                                    if (parameterName.equals(interfaceHttpData1.getName())) {
+                                        try {
+                                            route.getParamters()[i] = attribute.getValue();
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+        }
+
 }
+
