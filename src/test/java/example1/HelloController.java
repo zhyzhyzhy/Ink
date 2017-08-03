@@ -2,6 +2,7 @@ package example1;
 
 import com.noname.NoName;
 import com.noname.web.annotation.*;
+import com.noname.web.http.HttpHeader;
 import com.noname.web.http.Response;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
@@ -23,7 +24,12 @@ public class HelloController {
     @GET("/index")
     public Response getIndex(@RequestParam String name,
                              @RequestParam String password) {
-        return Response.status(HttpResponseStatus.OK).body(Collections.singletonMap(name, password)).build();
+        return Response
+                .status(HttpResponseStatus.OK)
+                .body(Collections.singletonMap(name, password))
+                .header(HttpHeader.ContentType, "application/json")
+                .build();
+
     }
 
     @POST("/new")

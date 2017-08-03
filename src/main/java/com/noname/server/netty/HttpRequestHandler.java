@@ -25,8 +25,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     private final Logger log = LoggerFactory.getLogger(HttpRequestHandler.class);
 
-    private final SecurityManager securityManager = new SecurityManager();
-
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
@@ -70,7 +68,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
         } else {
             FullHttpResponse response = processResponse(message);
-            response.headers().set("Content-Type", "application/json");
             channelHandlerContext.write(response);
         }
 
@@ -78,12 +75,21 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     public FullHttpResponse processResponse(Response response) {
 
+        DefaultFullHttpResponse fullHttpResponse = null;
         if (response.getResponseEntity() == null) {
-            return new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, response.getResponseStatus());
+            fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, response.getResponseStatus());
         }
         else {
-            return new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, response.getResponseStatus(), Unpooled.copiedBuffer(JSON.toJSONString(response.getResponseEntity()).getBytes()));
+            fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, response.getResponseStatus(), Unpooled.copiedBuffer(JSON.toJSONString(response.getResponseEntity()).getBytes()));
         }
+        for (String s : response.getHeaders().keySet()) {
+            fullHttpResponse.headers().add(s, response.getHeaders().get(s));
+        }
+        if (!fullHttpResponse.headers().contains("Content_type")) {
+            fullHttpResponse.headers().set("Content-Type", "application/json");
+        }
+
+        return fullHttpResponse;
     }
 
     @Override

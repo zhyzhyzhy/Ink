@@ -3,6 +3,9 @@ package com.noname.web.http;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.sql.BatchUpdateException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by zhuyichen on 2017/7/13.
@@ -14,9 +17,20 @@ public class Response {
     private Object responseEntity;
     private HttpResponseStatus responseStatus;
 
-    public Response(Object responseEntity, HttpResponseStatus responseStatus) {
+    public Map<String, String> getHeaders() {
+        return headers;
+    }
+
+    public void setHeaders(Map<String, String> headers) {
+        this.headers = headers;
+    }
+
+    private Map<String, String> headers;
+
+    private Response(Object responseEntity, HttpResponseStatus responseStatus, Map<String, String> headers) {
         this.responseEntity = responseEntity;
         this.responseStatus = responseStatus;
+        this.headers = headers;
     }
 
     public Object getResponseEntity() {
@@ -51,6 +65,7 @@ public class Response {
     public static class Builder {
         private HttpResponseStatus status = HttpResponseStatus.OK;
         private Object object;
+        private Map<HttpHeader, String> headers;
         public Builder(HttpResponseStatus status) {
             this.status = status;
         }
@@ -60,7 +75,16 @@ public class Response {
             return this;
         }
         public Response build() {
-            return new Response(object, status);
+            Map<String, String> map = new HashMap<>();
+            headers.keySet().forEach(s -> map.putIfAbsent(s.toString(), headers.get(s)));
+            return new Response(object, status, map);
+        }
+        public Builder header(HttpHeader header, String value) {
+            if (headers == null) {
+                headers = new HashMap<>();
+            }
+            headers.putIfAbsent(header, value);
+            return this;
         }
     }
 
