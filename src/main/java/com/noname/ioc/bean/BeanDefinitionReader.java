@@ -4,6 +4,7 @@ package com.noname.ioc.bean;
 import com.noname.NoName;
 import com.noname.NoNameConfigure;
 import com.noname.db.Service;
+import com.noname.filter.Filter;
 import com.noname.ioc.annotation.Bean;
 import com.noname.ioc.annotation.Component;
 import com.noname.ioc.annotation.Inject;
@@ -108,7 +109,8 @@ public class BeanDefinitionReader {
                         Class<?> class1 = Class.forName(pack + "." + f.getName().replace(".class", ""));
                         if (class1.getAnnotation(Component.class) != null
                                 || class1.getAnnotation(Controller.class) != null
-                                || class1.getAnnotation(Service.class) != null) {
+                                || class1.getAnnotation(Service.class) != null
+                                || class1.getAnnotation(Filter.class) != null) {
                             classList.add(class1);
                             this.register.registerBean(class1.newInstance());
                             log.info("register bean {}", class1);

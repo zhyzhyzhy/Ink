@@ -1,5 +1,6 @@
 package com.noname;
 
+import com.noname.filter.FilterUtil;
 import com.noname.ioc.context.IocContext;
 import com.noname.security.SecurityManager;
 import com.noname.server.NoNameServer;
@@ -26,6 +27,7 @@ public class NoName {
         //get all route info
         routes = RouteRegister.registerRoute(iocContext.getDefinitions());
 
+        FilterUtil.registerFilter(iocContext.getDefinitions());
 
         noNameServer.setList(routes);
     }

@@ -1,4 +1,6 @@
-**still working on**
+**still working on**   
+**for personal learning**
+**current has many many bugs**
 ------
 
 ### Example 

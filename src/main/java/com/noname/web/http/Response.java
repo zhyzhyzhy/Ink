@@ -15,23 +15,30 @@ import java.util.Map;
  */
 public class Response {
     private Object responseEntity;
-    private HttpResponseStatus responseStatus;
+    private HttpResponseStatus responseStatus = HttpResponseStatus.NOT_FOUND;
+    private Map<String, String> headers = new HashMap<>();
+
+    public Response(){}
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    public void header(HttpHeader header, String value) {
+        headers.putIfAbsent(header.toString(), value);
     }
 
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
 
-    private Map<String, String> headers;
-
     private Response(Object responseEntity, HttpResponseStatus responseStatus, Map<String, String> headers) {
         this.responseEntity = responseEntity;
         this.responseStatus = responseStatus;
-        this.headers = headers;
+        this.headers.putAll(headers);
     }
+
+
 
     public Object getResponseEntity() {
         return responseEntity;
@@ -76,7 +83,9 @@ public class Response {
         }
         public Response build() {
             Map<String, String> map = new HashMap<>();
-            headers.keySet().forEach(s -> map.putIfAbsent(s.toString(), headers.get(s)));
+            if (headers != null) {
+                headers.keySet().forEach(s -> map.putIfAbsent(s.toString(), headers.get(s)));
+            }
             return new Response(object, status, map);
         }
         public Builder header(HttpHeader header, String value) {
@@ -86,6 +95,11 @@ public class Response {
             headers.putIfAbsent(header, value);
             return this;
         }
+    }
+
+    public static Response mergeResponse(Response response1, Response response2) {
+        //to do
+        return response2;
     }
 
 

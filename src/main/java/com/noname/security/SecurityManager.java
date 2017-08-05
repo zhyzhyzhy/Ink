@@ -39,7 +39,7 @@ public class SecurityManager {
             NoNameConfigure noNameConfigure = (NoNameConfigure) ob;
             iocContext.registerBean(new AuthenticationRoutes());
             SecurityConfig.KEY = noNameConfigure.SecurityKey();
-            System.out.printf(noNameConfigure.SecurityKey());
+//            System.out.printf(noNameConfigure.SecurityKey());
             SecurityConfig.anthenticationOpen = noNameConfigure.anthenticationOpen();
         }
 
@@ -70,9 +70,9 @@ public class SecurityManager {
         Role role = route.getMethod().getAnnotation(Role.class);
         String[] permitRoles = role.value();
 
-        System.out.println(currentUser.getUserName());
+//        System.out.println(currentUser.getUserName());
         for (String role1 : currentUser.getRoles()) {
-            System.out.println(role1);
+//            System.out.println(role1);
             for (String role2 : permitRoles) {
                 if (role1.equals(role2)) {
                     UserDetailSetter(route, currentUser);
