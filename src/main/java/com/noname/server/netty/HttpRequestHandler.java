@@ -97,7 +97,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         }
         //work
         if (!fullHttpResponse.headers().contains("Content_type")) {
-            fullHttpResponse.headers().set("Content-Type", "application/json");
+            fullHttpResponse.headers().set("Content-Type", "application/json;charset=utf-8");
         }
 
         return fullHttpResponse;

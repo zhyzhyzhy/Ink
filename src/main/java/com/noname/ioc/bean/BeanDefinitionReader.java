@@ -3,12 +3,14 @@ package com.noname.ioc.bean;
 
 import com.noname.NoName;
 import com.noname.NoNameConfigure;
+import com.noname.db.MybatisConfig;
 import com.noname.db.Service;
 import com.noname.filter.Filter;
 import com.noname.ioc.annotation.Bean;
 import com.noname.ioc.annotation.Component;
 import com.noname.ioc.annotation.Inject;
 import com.noname.web.annotation.Controller;
+import org.apache.ibatis.annotations.Mapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,6 +44,7 @@ public class BeanDefinitionReader {
             Object object = configureClass.newInstance();
             this.register.registerBean(configureClass.newInstance());
             NoNameConfigure configure = (NoNameConfigure)object;
+            MybatisConfig.configure(object);
             for (String beanPackage : configure.beansPackage()) {
                 log.info("package {} is being scan", beanPackage);
                 addPackageToScan(beanPackage);
@@ -67,6 +70,9 @@ public class BeanDefinitionReader {
                             //先从containner中寻找bean
                             Object object = this.register.getBean(Class.forName(field.getGenericType().toString().split(" ")[1]));
 
+                            if (object == null) {
+                                object = this.register.getBean(field.getType().getName());
+                            }
                             //如果没找到，则new一个
                             if (object == null) {
                                 object = Class.forName(field.getGenericType().toString().split(" ")[1]).newInstance();
@@ -110,10 +116,17 @@ public class BeanDefinitionReader {
                         if (class1.getAnnotation(Component.class) != null
                                 || class1.getAnnotation(Controller.class) != null
                                 || class1.getAnnotation(Service.class) != null
-                                || class1.getAnnotation(Filter.class) != null) {
+                                || class1.getAnnotation(Filter.class) != null
+                                ) {
                             classList.add(class1);
                             this.register.registerBean(class1.newInstance());
                             log.info("register bean {}", class1);
+                        }
+                        if (class1.getAnnotation(Mapper.class) != null) {
+                            MybatisConfig.addMapper(class1);
+                            log.info("add mapper {}", class1);
+                            MybatisConfig.buildSessionFactory();
+                            this.register.registerBean(class1.getName(), MybatisConfig.getMapper(class1));
                         }
                     }
                 }

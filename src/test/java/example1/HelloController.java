@@ -5,10 +5,20 @@ import com.noname.web.annotation.*;
 import com.noname.web.http.HttpHeader;
 import com.noname.web.http.Response;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import org.apache.ibatis.datasource.pooled.PooledDataSourceFactory;
+import org.apache.ibatis.mapping.Environment;
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.apache.ibatis.transaction.TransactionFactory;
+import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 
+import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 
 @Controller
 public class HelloController {
@@ -52,6 +62,8 @@ public class HelloController {
 
 
     public static void main(String[] args) {
+
+
         new NoName(8091, HelloController.class).start();
     }
 }

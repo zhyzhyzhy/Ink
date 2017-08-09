@@ -1,5 +1,6 @@
 package com.noname;
 
+import com.noname.db.MybatisConfig;
 import com.noname.filter.FilterUtil;
 import com.noname.ioc.context.IocContext;
 import com.noname.security.SecurityManager;
@@ -28,6 +29,11 @@ public class NoName {
         routes = RouteRegister.registerRoute(iocContext.getDefinitions());
 
         FilterUtil.registerFilter(iocContext.getDefinitions());
+
+        //db configure
+//        MybatisConfig.configure(iocContext.getBean(configure));
+
+        //Mapper injection
 
         noNameServer.setList(routes);
     }

@@ -29,8 +29,12 @@ public class SecurityManager {
         //保存所有的service
         for (String key : beanDefinitionMap.keySet()) {
             BeanDefinition beanDefinition = beanDefinitionMap.get(key);
-            if (beanDefinition.getObject().getClass().getAnnotation(Service.class) != null) {
-                roleDetails.add((UserDetailService) beanDefinition.getObject());
+            Class<?> clazz = beanDefinition.getObject().getClass();
+            if (clazz.getAnnotation(Service.class) != null) {
+                Class superclass = clazz.getSuperclass();
+                if (superclass.equals(UserDetailService.class)) {
+                    roleDetails.add((UserDetailService) beanDefinition.getObject());
+                }
             }
         }
 
