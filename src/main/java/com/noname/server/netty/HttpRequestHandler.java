@@ -3,11 +3,15 @@ package com.noname.server.netty;
 import com.alibaba.fastjson.JSON;
 import com.noname.exception.UnauthorizedException;
 import com.noname.filter.FilterUtil;
+import com.noname.web.http.HttpHeader;
+import com.noname.web.http.HttpSession;
 import com.noname.web.http.Request;
 import com.noname.web.http.Response;
+import com.noname.web.http.util.SessionUtil;
 import com.noname.web.route.Route;
 import com.noname.web.route.RouteFinder;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
@@ -23,7 +27,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-
+        System.out.println("Channel active");
     }
 
 
@@ -31,14 +35,18 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         if (fullHttpRequest == null) {
             return;
         }
-
         log.info("Request [{}]", fullHttpRequest.uri());
 
-        Response message = new Response();
-        Request request1 = new Request(fullHttpRequest);
-        if (!FilterUtil.doFilter(request1, message)) {
+
+
+        SessionUtil.addSession(channelHandlerContext.channel());
+        Request request = new Request(channelHandlerContext.channel(), fullHttpRequest);
+
+        Response preparedResponse = new Response();
+
+        if (!FilterUtil.doFilter(request, preparedResponse)) {
             channelHandlerContext.write(
-                    processResponse(message)
+                    processResponse(channelHandlerContext.channel(), preparedResponse)
             );
             return;
         }
@@ -48,47 +56,45 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         try {
              route = RouteFinder.findRoute(fullHttpRequest);
         } catch (UnauthorizedException ignored) {
-            HttpResponse request = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, HttpResponseStatus.UNAUTHORIZED);
-            channelHandlerContext.write(request);
+            HttpResponse exceptionResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UNAUTHORIZED);
+            channelHandlerContext.write(exceptionResponse);
             return;
         }
 
         if (route != null) {
             Object o = route.getMethod().invoke(route.getObject(), route.getParamters());
             if (o instanceof Response) {
-                message = Response.mergeResponse(message, (Response)o);
+                preparedResponse = Response.mergeResponse(preparedResponse, (Response)o);
             }
             else {
-                message.setResponseEntity(o);
-                message.setResponseStatus(HttpResponseStatus.OK);
+                preparedResponse.setResponseEntity(o);
+                preparedResponse.setResponseStatus(HttpResponseStatus.OK);
             }
-            log.info("Response {{}}", message.getResponseEntity());
+            log.info("Response {{}}", preparedResponse.getResponseEntity());
         }
 
         if (route == null) {
-
-            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, HttpResponseStatus.NOT_FOUND, Unpooled.copiedBuffer(page404(fullHttpRequest.uri()).getBytes()));
+            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
+            response.headers().add(HttpHeader.ContentLength.toString(), "0");
             channelHandlerContext.write(response);
-
-
         } else {
-            FullHttpResponse response = processResponse(message);
+            FullHttpResponse response = processResponse(channelHandlerContext.channel(), preparedResponse);
             channelHandlerContext.write(response);
         }
 
     }
 
-    public FullHttpResponse processResponse(Response response) {
+    public FullHttpResponse processResponse(Channel channel, Response response) {
 
         DefaultFullHttpResponse fullHttpResponse = null;
 
         //work
         if (response.getResponseEntity() == null) {
-                fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, response.getResponseStatus());
+                fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, response.getResponseStatus());
         }
         else {
             //work
-            fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_0, response.getResponseStatus(), Unpooled.copiedBuffer(JSON.toJSONString(response.getResponseEntity()).getBytes()));
+            fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, response.getResponseStatus(), Unpooled.copiedBuffer(JSON.toJSONString(response.getResponseEntity()).getBytes()));
         }
 
         //work
@@ -96,9 +102,14 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             fullHttpResponse.headers().add(s, response.getHeaders().get(s));
         }
         //work
-        if (!fullHttpResponse.headers().contains("Content_type")) {
+        if (!fullHttpResponse.headers().contains("Content-type")) {
             fullHttpResponse.headers().set("Content-Type", "application/json;charset=utf-8");
         }
+
+        //session action
+        fullHttpResponse.headers().add("Set-Cookie", "NoNameSessionId="+SessionUtil.getSession(channel).getSessionId());
+        fullHttpResponse.headers().add("Connection", "keep-alive");
+        fullHttpResponse.headers().add("Content-Length", fullHttpResponse.content().array().length);
 
         return fullHttpResponse;
     }
@@ -106,11 +117,11 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         ctx.flush();
-        ctx.close();
     }
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println("close ctx");
         ctx.close();
     }
 

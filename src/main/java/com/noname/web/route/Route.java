@@ -9,11 +9,15 @@ import java.lang.reflect.Method;
  * Created by zhuyichen on 2017/7/12.
  */
 public class Route {
+    //方法所在的对象
     private Object object;
+    //方法
     private Method method;
+    //请求的方法
     private HttpMethod httpMethod;
+    //请求的路径
     private String path;
-
+    //是否有role注解
     private boolean security = false;
 
     public boolean isSecurity() {

@@ -1,11 +1,14 @@
 package com.noname.web.http;
 
+import io.netty.channel.Channel;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.netty.handler.codec.http.cookie.Cookie;
 
 import java.sql.BatchUpdateException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by zhuyichen on 2017/7/13.
@@ -18,7 +21,9 @@ public class Response {
     private HttpResponseStatus responseStatus = HttpResponseStatus.NOT_FOUND;
     private Map<String, String> headers = new HashMap<>();
 
-    public Response(){}
+    public Response(){
+
+    }
 
     public Map<String, String> getHeaders() {
         return headers;
@@ -98,7 +103,7 @@ public class Response {
     }
 
     public static Response mergeResponse(Response response1, Response response2) {
-        //to do
+        //TODO
         return response2;
     }
 
