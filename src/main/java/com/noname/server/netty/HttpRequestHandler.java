@@ -4,10 +4,8 @@ import com.alibaba.fastjson.JSON;
 import com.noname.exception.UnauthorizedException;
 import com.noname.filter.FilterUtil;
 import com.noname.web.http.HttpHeader;
-import com.noname.web.http.HttpSession;
 import com.noname.web.http.Request;
 import com.noname.web.http.Response;
-import com.noname.web.http.util.SessionUtil;
 import com.noname.web.route.Route;
 import com.noname.web.route.RouteFinder;
 import io.netty.buffer.Unpooled;
@@ -39,10 +37,9 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
 
 
-        SessionUtil.addSession(channelHandlerContext.channel());
-        Request request = new Request(channelHandlerContext.channel(), fullHttpRequest);
+        Request request = new Request(fullHttpRequest);
 
-        Response preparedResponse = new Response();
+        Response preparedResponse = new Response(fullHttpRequest);
 
         if (!FilterUtil.doFilter(request, preparedResponse)) {
             channelHandlerContext.write(
@@ -107,7 +104,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         }
 
         //session action
-        fullHttpResponse.headers().add("Set-Cookie", "NoNameSessionId="+SessionUtil.getSession(channel).getSessionId());
         fullHttpResponse.headers().add("Connection", "keep-alive");
         fullHttpResponse.headers().add("Content-Length", fullHttpResponse.content().array().length);
 
@@ -125,7 +121,5 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         ctx.close();
     }
 
-    public String page404(String url) {
-        return "<h1>URL [ " + url + " ] Not Found</h1>";
-    }
+
 }

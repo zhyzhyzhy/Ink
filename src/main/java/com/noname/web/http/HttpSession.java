@@ -1,7 +1,6 @@
 package com.noname.web.http;
 
 import com.noname.security.User;
-import com.noname.web.http.util.SessionUtil;
 import io.netty.channel.Channel;
 
 import java.util.HashMap;
@@ -12,9 +11,6 @@ import java.util.Map;
  */
 public class HttpSession {
 
-    //对应的channel
-    private Channel channel;
-
     //sessionId
     private String sessionId;
 
@@ -24,8 +20,10 @@ public class HttpSession {
     //for personal attributes, lazy initialization
     private Map<String, Object> attributes;
 
-    public HttpSession(Channel channel) {
-        this.channel = channel;
+    public HttpSession(){}
+
+    public HttpSession(String sessionId) {
+        this.sessionId = sessionId;
     }
 
     public String getSessionId() {
@@ -44,13 +42,6 @@ public class HttpSession {
         this.user = user;
     }
 
-    public Channel getChannel() {
-        return channel;
-    }
-
-    public void setChannel(Channel channel) {
-        this.channel = channel;
-    }
 
     public void addAttribute(String key, String value) {
         if (attributes == null) {

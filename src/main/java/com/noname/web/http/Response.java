@@ -1,14 +1,18 @@
 package com.noname.web.http;
 
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.cookie.Cookie;
+import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 
 import java.sql.BatchUpdateException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import static com.noname.web.http.HttpHeader.SetCookie;
 
 /**
  * Created by zhuyichen on 2017/7/13.
@@ -20,9 +24,26 @@ public class Response {
     private Object responseEntity;
     private HttpResponseStatus responseStatus = HttpResponseStatus.NOT_FOUND;
     private Map<String, String> headers = new HashMap<>();
+    private String sessionId;
 
     public Response(){
 
+    }
+
+    public Response(FullHttpRequest fullHttpRequest) {
+        if (fullHttpRequest.headers().contains("Cookie")) {
+            ServerCookieDecoder.LAX.decode(fullHttpRequest.headers().get("Cookie"))
+                    .forEach(cookie -> {
+                        if (cookie.name().equals("SessionId")) {
+                            this.sessionId = cookie.value();
+                        }
+                    });
+        }
+        if (sessionId == null) {
+            sessionId = SessionManager.createSessionId();
+            SessionManager.addSession(sessionId);
+            headers.put(SetCookie.toString(), "SessionId="+sessionId);
+        }
     }
 
     public Map<String, String> getHeaders() {
@@ -33,6 +54,9 @@ public class Response {
         headers.putIfAbsent(header.toString(), value);
     }
 
+    public void header(String header, String value) {
+        headers.putIfAbsent(header, value);
+    }
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
     }
@@ -104,6 +128,7 @@ public class Response {
 
     public static Response mergeResponse(Response response1, Response response2) {
         //TODO
+        response1.headers.forEach(response2::header);
         return response2;
     }
 

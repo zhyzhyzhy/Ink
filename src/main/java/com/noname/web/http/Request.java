@@ -1,10 +1,7 @@
 package com.noname.web.http;
 
-import com.noname.web.http.util.SessionUtil;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.cookie.CookieDecoder;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 
 import java.util.HashMap;
@@ -17,16 +14,16 @@ public class Request {
 
     private FullHttpRequest fullHttpRequest;
 
-    private HttpSession session;
+    private String sessionId;
 
     private Map<String, String> cookies = new HashMap<>();
 
-    public Request(Channel channel, FullHttpRequest fullHttpRequest) {
+    public Request(FullHttpRequest fullHttpRequest) {
         this.fullHttpRequest = fullHttpRequest;
         //得到cookie
         parseCookies();
         //得到session
-        parseSession(channel);
+        parseSession();
     }
 
     private void parseCookies() {
@@ -37,12 +34,8 @@ public class Request {
         }
     }
 
-    private void parseSession(Channel channel) {
+    private void parseSession() {
         String sessionId = cookies.getOrDefault("SessionId", null);
-        if (sessionId == null) {
-            return;
-        }
-        this.session = SessionUtil.getSession(channel);
     }
 
 
@@ -57,7 +50,10 @@ public class Request {
 
 
     public HttpSession getSession() {
-        return session;
+        if (sessionId == null) {
+            return null;
+        }
+        return SessionManager.getSession(sessionId);
     }
 
 }
