@@ -24,25 +24,25 @@ public class Response {
     private Object responseEntity;
     private HttpResponseStatus responseStatus = HttpResponseStatus.NOT_FOUND;
     private Map<String, String> headers = new HashMap<>();
-    private String sessionId;
 
     public Response(){
 
     }
 
     public Response(FullHttpRequest fullHttpRequest) {
+        final String[] sessionId = {null};
         if (fullHttpRequest.headers().contains("Cookie")) {
             ServerCookieDecoder.LAX.decode(fullHttpRequest.headers().get("Cookie"))
                     .forEach(cookie -> {
                         if (cookie.name().equals("SessionId")) {
-                            this.sessionId = cookie.value();
+                            sessionId[0] = cookie.value();
                         }
                     });
         }
-        if (sessionId == null) {
-            sessionId = SessionManager.createSessionId();
-            SessionManager.addSession(sessionId);
-            headers.put(SetCookie.toString(), "SessionId="+sessionId);
+        if (sessionId[0] == null) {
+            sessionId[0] = SessionManager.createSessionId();
+            SessionManager.addSession(sessionId[0]);
+            headers.put(SetCookie.toString(), "SessionId="+ sessionId[0]);
         }
     }
 
@@ -128,6 +128,7 @@ public class Response {
 
     public static Response mergeResponse(Response response1, Response response2) {
         //TODO
+
         response1.headers.forEach(response2::header);
         return response2;
     }

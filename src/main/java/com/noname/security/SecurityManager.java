@@ -43,7 +43,6 @@ public class SecurityManager {
             NoNameConfigure noNameConfigure = (NoNameConfigure) ob;
             iocContext.registerBean(new AuthenticationRoutes());
             SecurityConfig.KEY = noNameConfigure.SecurityKey();
-//            System.out.printf(noNameConfigure.SecurityKey());
             SecurityConfig.anthenticationOpen = noNameConfigure.anthenticationOpen();
         }
 

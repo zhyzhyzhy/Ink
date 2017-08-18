@@ -32,4 +32,9 @@ public class HelloController {
     public Map<String, String> getIndex() {
         return Collections.singletonMap("hello", "world");
     }
+
+    @GET("/test")
+    public Map<String, String> getTest() {
+        return Collections.singletonMap("hello","test");
+    }
 }

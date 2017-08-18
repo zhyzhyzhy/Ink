@@ -11,12 +11,12 @@ public class BeanMetaDataResolver {
     public BeanMetaData getBeanMetaData(Class<?> beanClass) {
         BeanMetaData beanMetaData = new BeanMetaData();
         beanMetaData.setBeanClass(beanClass);
-        beanMetaData.setAnnotations(getAnnotions(beanClass));
+        beanMetaData.setAnnotations(getAnnotations(beanClass));
         beanMetaData.setFields(getFields(beanClass));
         beanMetaData.setMethods(getMethods(beanClass));
         return beanMetaData;
     }
-    public Annotation[] getAnnotions(Class<?> beanClass) {
+    public Annotation[] getAnnotations(Class<?> beanClass) {
         try {
            return Class.forName(beanClass.getName()).getAnnotations();
         } catch (ClassNotFoundException e) {

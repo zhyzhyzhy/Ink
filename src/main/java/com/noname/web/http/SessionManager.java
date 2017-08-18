@@ -31,7 +31,7 @@ public class SessionManager {
         Map<String, HttpSession> map = getSessions();
         if (map.get(sessionId) == null) {
             HttpSession httpSession = new HttpSession();
-            httpSession.setSessionId(createSessionId());
+            httpSession.setSessionId(sessionId);
             map.put(httpSession.getSessionId(), httpSession);
         }
     }

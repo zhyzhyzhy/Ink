@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.noname.exception.UnauthorizedException;
 import com.noname.filter.FilterUtil;
 import com.noname.web.http.HttpHeader;
+import com.noname.web.http.HttpResponseBuilder;
 import com.noname.web.http.Request;
 import com.noname.web.http.Response;
 import com.noname.web.route.Route;
@@ -25,7 +26,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("Channel active");
     }
 
 
@@ -43,7 +43,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
         if (!FilterUtil.doFilter(request, preparedResponse)) {
             channelHandlerContext.write(
-                    processResponse(channelHandlerContext.channel(), preparedResponse)
+                    HttpResponseBuilder.build(channelHandlerContext.channel(), preparedResponse)
             );
             return;
         }
@@ -53,7 +53,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         try {
              route = RouteFinder.findRoute(fullHttpRequest);
         } catch (UnauthorizedException ignored) {
-            HttpResponse exceptionResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UNAUTHORIZED);
+            HttpResponse exceptionResponse = HttpResponseBuilder.build(HttpResponseStatus.UNAUTHORIZED);
             channelHandlerContext.write(exceptionResponse);
             return;
         }
@@ -71,44 +71,15 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         }
 
         if (route == null) {
-            FullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.NOT_FOUND);
-            response.headers().add(HttpHeader.ContentLength.toString(), "0");
+            HttpResponse response = HttpResponseBuilder.build(HttpResponseStatus.NOT_FOUND);
             channelHandlerContext.write(response);
         } else {
-            FullHttpResponse response = processResponse(channelHandlerContext.channel(), preparedResponse);
+            FullHttpResponse response = HttpResponseBuilder.build(channelHandlerContext.channel(), preparedResponse);
             channelHandlerContext.write(response);
         }
 
     }
 
-    public FullHttpResponse processResponse(Channel channel, Response response) {
-
-        DefaultFullHttpResponse fullHttpResponse = null;
-
-        //work
-        if (response.getResponseEntity() == null) {
-                fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, response.getResponseStatus());
-        }
-        else {
-            //work
-            fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, response.getResponseStatus(), Unpooled.copiedBuffer(JSON.toJSONString(response.getResponseEntity()).getBytes()));
-        }
-
-        //work
-        for (String s : response.getHeaders().keySet()) {
-            fullHttpResponse.headers().add(s, response.getHeaders().get(s));
-        }
-        //work
-        if (!fullHttpResponse.headers().contains("Content-type")) {
-            fullHttpResponse.headers().set("Content-Type", "application/json;charset=utf-8");
-        }
-
-        //session action
-        fullHttpResponse.headers().add("Connection", "keep-alive");
-        fullHttpResponse.headers().add("Content-Length", fullHttpResponse.content().array().length);
-
-        return fullHttpResponse;
-    }
 
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
@@ -117,7 +88,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        System.out.println("close ctx");
         ctx.close();
     }
 

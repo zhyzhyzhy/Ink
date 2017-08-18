@@ -16,7 +16,9 @@ public class Request {
 
     private String sessionId;
 
-    private Map<String, String> cookies = new HashMap<>();
+    private HttpSession session;
+
+    private Map<String, Cookie> cookies = new HashMap<>();
 
     public Request(FullHttpRequest fullHttpRequest) {
         this.fullHttpRequest = fullHttpRequest;
@@ -30,17 +32,19 @@ public class Request {
         //use ServerCookieDecoder to decode cookies in headers
         if (fullHttpRequest.headers().contains("Cookie")) {
             ServerCookieDecoder.LAX.decode(fullHttpRequest.headers().get("Cookie"))
-                    .forEach(header -> cookies.putIfAbsent(header.name(), header.value()));
+                    .forEach(cookie -> cookies.putIfAbsent(cookie.name(), new Cookie(cookie)));
         }
     }
 
     private void parseSession() {
-        String sessionId = cookies.getOrDefault("SessionId", null);
+        Cookie sessionId = cookies.getOrDefault("SessionId", null);
+        if (sessionId != null) {
+            session = SessionManager.getSession(sessionId.getValue());
+        }
     }
 
 
-
-    public Map<String, String> cookies() {
+    public Map<String, Cookie> cookies() {
         return cookies;
     }
 
@@ -50,10 +54,7 @@ public class Request {
 
 
     public HttpSession getSession() {
-        if (sessionId == null) {
-            return null;
-        }
-        return SessionManager.getSession(sessionId);
+        return session;
     }
 
 }
