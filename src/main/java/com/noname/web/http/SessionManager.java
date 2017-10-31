@@ -4,8 +4,9 @@ import io.netty.channel.Channel;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -20,6 +21,11 @@ public class SessionManager {
     private static Map<String, HttpSession> getSessions() {
         return sessions;
     }
+
+    static {
+        sessionClear();
+    }
+
     //create a random sessionId
     //一个简单的实现
     public static String createSessionId() {
@@ -48,4 +54,17 @@ public class SessionManager {
         map.put(session.getSessionId(), session);
     }
 
+    //清除过期session
+    public static void sessionClear() {
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        Runnable action = () -> {
+            sessions.forEach((key, cookie) -> {
+                if (cookie.getExpiredTime() < System.currentTimeMillis()) {
+                    sessions.remove(key);
+                }
+            });
+        };
+        System.out.println("start ... ");
+        executor.scheduleAtFixedRate(action, 5, 1, TimeUnit.HOURS);
+    }
 }

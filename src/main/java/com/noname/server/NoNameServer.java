@@ -37,10 +37,11 @@ public class NoNameServer {
             ChannelFuture future = bootstrap.bind(port).sync();
             log.info("start listen in port {}", port);
             future.channel().closeFuture().sync();
-        } catch (InterruptedException e) {
+        } catch (Exception e ) {
+            e.printStackTrace();
+        } finally {
             boss.shutdownGracefully();
             worker.shutdownGracefully();
-            e.printStackTrace();
         }
     }
 

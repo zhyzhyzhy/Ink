@@ -3,6 +3,7 @@ package com.noname.web.http;
 import com.noname.security.User;
 import io.netty.channel.Channel;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +20,17 @@ public class HttpSession {
 
     //for personal attributes, lazy initialization
     private Map<String, Object> attributes;
+
+    //过期时间，用于清除
+    private long expiredTime = new Date().getTime() + 10000;
+
+    public long getExpiredTime() {
+        return expiredTime;
+    }
+
+    public void setExpiredTime(long expiredTime) {
+        this.expiredTime = expiredTime;
+    }
 
     public HttpSession(){}
 

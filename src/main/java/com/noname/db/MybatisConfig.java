@@ -23,6 +23,7 @@ public class MybatisConfig {
     private static SqlSessionFactory sqlSessionFactory;
 
     public static final Logger log = LoggerFactory.getLogger(MybatisConfig.class);
+
     public static void configure(Object object) {
         if (!(object instanceof NoNameConfigure)) {
             log.info("no db configure");

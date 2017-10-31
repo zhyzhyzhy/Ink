@@ -11,7 +11,7 @@ public class Cookie {
     private String value;
     private String host;
     private String path;
-    private long createTime = new Date().getTime();
+    private long createTime = System.currentTimeMillis();
     private long expiredTime;
     private boolean httpOnly;
     private boolean isSecure;
