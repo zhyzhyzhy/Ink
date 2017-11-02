@@ -3,6 +3,7 @@ package com.noname.ioc.bean;
 
 import com.noname.NoName;
 import com.noname.NoNameConfigure;
+import com.noname.aop.annotation.Proxy;
 import com.noname.db.MybatisConfig;
 import com.noname.db.Service;
 import com.noname.filter.Filter;
@@ -117,6 +118,7 @@ public class BeanDefinitionReader {
                                 || class1.getAnnotation(Controller.class) != null
                                 || class1.getAnnotation(Service.class) != null
                                 || class1.getAnnotation(Filter.class) != null
+                                || class1.getAnnotation(Proxy.class) != null
                                 ) {
                             classList.add(class1);
                             this.register.registerBean(class1.newInstance());

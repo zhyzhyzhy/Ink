@@ -28,7 +28,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
     }
 
-
+    @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
         if (fullHttpRequest == null) {
             return;
@@ -59,7 +59,13 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         }
 
         if (route != null) {
+            if (route.getBeforeProxyChain().size() != 0) {
+                route.getBeforeProxyChain().doChain(route.getParamters());
+            }
             Object o = route.getMethod().invoke(route.getObject(), route.getParamters());
+            if (route.getAfterProxyChain().size() != 0) {
+                route.getAfterProxyChain().doChain(route.getParamters());
+            }
             if (o instanceof Response) {
                 preparedResponse = Response.mergeResponse(preparedResponse, (Response)o);
             }

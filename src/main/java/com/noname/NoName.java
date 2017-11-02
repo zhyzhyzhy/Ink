@@ -1,5 +1,7 @@
 package com.noname;
 
+import com.noname.aop.ProxyChain;
+import com.noname.aop.ProxyManager;
 import com.noname.db.MybatisConfig;
 import com.noname.filter.FilterUtil;
 import com.noname.ioc.context.IocContext;
@@ -29,6 +31,9 @@ public class NoName {
         routes = RouteRegister.registerRoute(iocContext.getDefinitions());
 
         FilterUtil.registerFilter(iocContext.getDefinitions());
+
+        ProxyManager.registerProxy(iocContext.getDefinitions(), routes);
+
 
         //db configure
 //        MybatisConfig.configure(iocContext.getBean(configure));

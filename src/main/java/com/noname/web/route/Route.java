@@ -1,6 +1,7 @@
 package com.noname.web.route;
 
 
+import com.noname.aop.ProxyChain;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.lang.reflect.Method;
@@ -19,6 +20,27 @@ public class Route {
     private String path;
     //是否有role注解
     private boolean security = false;
+
+    //Aop的前置路由
+    private ProxyChain beforeProxyChain = new ProxyChain();
+    //Aop的后置路由
+    private ProxyChain afterProxyChain = new ProxyChain();
+
+    public ProxyChain getBeforeProxyChain() {
+        return beforeProxyChain;
+    }
+
+    public void setBeforeProxyChain(ProxyChain beforeProxyChain) {
+        this.beforeProxyChain = beforeProxyChain;
+    }
+
+    public ProxyChain getAfterProxyChain() {
+        return afterProxyChain;
+    }
+
+    public void setAfterProxyChain(ProxyChain afterProxyChain) {
+        this.afterProxyChain = afterProxyChain;
+    }
 
     public boolean isSecurity() {
         return security;
