@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com.zhy.noname</groupId>
-    <artifactId>noname</artifactId>
+    <groupId>org.ink</groupId>
+    <artifactId>ink-framework</artifactId>
     <packaging>jar</packaging>
     <version>1.0-SNAPSHOT</version>
-    <name>noname Maven Webapp</name>
+    <name>Ink-FrameWork</name>
     <url>http://maven.apache.org</url>
 
     <properties>
@@ -52,7 +52,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.25</version>
-            <scope>test</scope>
         </dependency>
 
 
@@ -116,7 +115,6 @@
                                     <exclude>jmock:*</exclude>
                                     <exclude>*:xml-apis</exclude>
                                     <exclude>org.apache.maven:lib:tests</exclude>
-                                    <exclude>log4j:log4j:jar:</exclude>
                                 </excludes>
                             </artifactSet>
                         </configuration>

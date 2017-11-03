@@ -6,6 +6,8 @@ import org.ink.security.SecurityManager;
 import org.ink.server.NoNameServer;
 import org.ink.web.route.Route;
 import org.ink.web.route.RouteRegister;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -13,6 +15,9 @@ import java.util.List;
  * Created by zhuyichen on 2017/7/11.
  */
 public class NoName {
+
+    private static final Logger log = LoggerFactory.getLogger(NoName.class);
+
     private NoNameServer noNameServer;
     private IocContext iocContext;
     private List<Route> routes;
@@ -38,6 +43,8 @@ public class NoName {
         //Mapper injection
 
         noNameServer.setList(routes);
+        log.info(WebConfig.getConfig("name"));
+
     }
     public void start() {
         noNameServer.start();

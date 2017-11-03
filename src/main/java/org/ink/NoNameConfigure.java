@@ -1,7 +1,5 @@
 package org.ink;
 
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.apache.ibatis.datasource.pooled.PooledDataSourceFactory;
 
 import javax.sql.DataSource;
