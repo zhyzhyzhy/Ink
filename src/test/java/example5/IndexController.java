@@ -1,9 +1,9 @@
 package example5;
 
 
-import com.noname.web.annotation.Controller;
-import com.noname.web.annotation.GET;
-import com.noname.web.annotation.PathVariable;
+import org.ink.web.annotation.Controller;
+import org.ink.web.annotation.GET;
+import org.ink.web.annotation.PathVariable;
 
 @Controller
 public class IndexController {

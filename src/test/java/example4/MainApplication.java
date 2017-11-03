@@ -1,9 +1,7 @@
 package example4;
 
-import com.noname.NoName;
-import com.noname.NoNameConfigure;
-import com.noname.ioc.annotation.Inject;
-import com.noname.web.annotation.*;
+import org.ink.NoName;
+import org.ink.NoNameConfigure;
 
 public class MainApplication extends NoNameConfigure{
 

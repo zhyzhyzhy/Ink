@@ -1,10 +1,9 @@
 package example2.service;
 
-import com.noname.db.Service;
-import com.noname.security.User;
-import com.noname.security.UserDetailService;
+import org.ink.db.Service;
+import org.ink.security.User;
+import org.ink.security.UserDetailService;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 
 @Service

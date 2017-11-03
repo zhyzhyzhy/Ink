@@ -1,11 +1,9 @@
 package example2.web;
 
-import com.noname.NoName;
-import com.noname.security.annotation.Role;
-import com.noname.web.annotation.*;
-import com.noname.web.http.Response;
+import org.ink.security.annotation.Role;
+import org.ink.web.annotation.Controller;
+import org.ink.web.annotation.GET;
 import example1.User;
-import io.netty.handler.codec.http.HttpResponseStatus;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -82,7 +82,7 @@
         </dependency>
     </dependencies>
     <build>
-        <finalName>noname</finalName>
+        <finalName>Ink</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

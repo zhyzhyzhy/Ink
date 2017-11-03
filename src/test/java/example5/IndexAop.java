@@ -1,12 +1,8 @@
 package example5;
 
-import com.noname.aop.annotation.After;
-import com.noname.aop.annotation.Before;
-import com.noname.aop.annotation.Proxy;
-import com.noname.web.http.HttpHeader;
-import com.noname.web.http.Request;
-import com.noname.web.http.Response;
-import io.netty.handler.codec.http.HttpResponseStatus;
+import org.ink.aop.annotation.After;
+import org.ink.aop.annotation.Before;
+import org.ink.aop.annotation.Proxy;
 
 @Proxy
 public class IndexAop {

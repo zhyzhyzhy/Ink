@@ -1,8 +1,7 @@
 package example5;
 
-import com.noname.NoName;
-import com.noname.NoNameConfigure;
-import com.noname.aop.annotation.After;
+import org.ink.NoName;
+import org.ink.NoNameConfigure;
 
 public class Application extends NoNameConfigure {
     @Override

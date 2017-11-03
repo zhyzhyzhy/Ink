@@ -1,8 +1,8 @@
 package example4;
 
-import com.noname.ioc.annotation.Inject;
-import com.noname.web.annotation.Controller;
-import com.noname.web.annotation.GET;
+import org.ink.ioc.annotation.Inject;
+import org.ink.web.annotation.Controller;
+import org.ink.web.annotation.GET;
 
 /**
  * Created by zhuyichen on 2017/8/9.

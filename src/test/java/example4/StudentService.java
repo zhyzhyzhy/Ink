@@ -1,9 +1,7 @@
 package example4;
 
-import com.noname.db.Service;
-import com.noname.ioc.annotation.Inject;
-import example4.Student;
-import example4.StudentMapper;
+import org.ink.db.Service;
+import org.ink.ioc.annotation.Inject;
 
 /**
  * Created by zhuyichen on 2017/8/9.

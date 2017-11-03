@@ -1,7 +1,7 @@
 package example2;
 
-import com.noname.NoName;
-import com.noname.NoNameConfigure;
+import org.ink.NoName;
+import org.ink.NoNameConfigure;
 
 /**
  * Created by zhuyichen on 2017/7/12.
