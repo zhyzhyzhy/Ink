@@ -76,6 +76,10 @@ public class RouteFinder {
         if (splitIndex == -1) {
             splitIndex = path.length();
         }
+        //如果最后一个字符是'/',去掉
+        if (path.charAt(splitIndex-1) == '/') {
+            splitIndex--;
+        }
 
         //遍历map
         for (Pattern pattern : routeMap.keySet()) {
@@ -83,6 +87,7 @@ public class RouteFinder {
             if (pattern.matcher(path.substring(0, splitIndex)).matches()) {
 
                 Route route = routeMap.get(pattern);
+
                 //如果请求方式一样
                 if (route.getHttpMethod().equals(method)) {
 
@@ -126,7 +131,6 @@ public class RouteFinder {
                 if (annotation instanceof RequestJson) {
                     //得到参数的类
                     Class<?> class1 = parameters[i].getType();
-
                     Object object = JSON.parseObject(json, class1);
                     route.getParamters()[i] = object;
                 }

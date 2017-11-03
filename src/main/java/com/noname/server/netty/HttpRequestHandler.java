@@ -1,16 +1,12 @@
 package com.noname.server.netty;
 
-import com.alibaba.fastjson.JSON;
 import com.noname.exception.UnauthorizedException;
-import com.noname.filter.FilterUtil;
-import com.noname.web.http.HttpHeader;
 import com.noname.web.http.HttpResponseBuilder;
 import com.noname.web.http.Request;
 import com.noname.web.http.Response;
+import com.noname.web.http.SessionManager;
 import com.noname.web.route.Route;
 import com.noname.web.route.RouteFinder;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
@@ -35,19 +31,9 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         }
         log.info("Request [{}]", fullHttpRequest.uri());
 
+        Request request = new Request(channelHandlerContext.channel(), fullHttpRequest);
 
-
-        Request request = new Request(fullHttpRequest);
-
-        Response preparedResponse = new Response(fullHttpRequest);
-
-        if (!FilterUtil.doFilter(request, preparedResponse)) {
-            channelHandlerContext.write(
-                    HttpResponseBuilder.build(channelHandlerContext.channel(), preparedResponse)
-            );
-            return;
-        }
-
+        Response preparedResponse = new Response(channelHandlerContext.channel(), fullHttpRequest);
 
         Route route = null;
         try {
@@ -59,21 +45,28 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         }
 
         if (route != null) {
+            Boolean continueProcess = true;
+            //before aop
             if (route.getBeforeProxyChain().size() != 0) {
-                route.getBeforeProxyChain().doChain(route.getParamters());
+                continueProcess = route.getBeforeProxyChain().doChain(request, preparedResponse, route);
             }
-            Object o = route.getMethod().invoke(route.getObject(), route.getParamters());
-            if (route.getAfterProxyChain().size() != 0) {
-                route.getAfterProxyChain().doChain(route.getParamters());
+
+            if (continueProcess) {
+                Object o = route.getMethod().invoke(route.getObject(), route.getParamters());
+
+                //after aop
+                if (route.getAfterProxyChain().size() != 0) {
+                    route.getAfterProxyChain().doChain(request, preparedResponse, route);
+                }
+
+                if (o instanceof Response) {
+                    preparedResponse = Response.mergeResponse(preparedResponse, (Response) o);
+                } else {
+                    preparedResponse.setResponseEntity(o);
+                    preparedResponse.setResponseStatus(HttpResponseStatus.OK);
+                }
+                log.info("Response {{}}", preparedResponse.getResponseEntity());
             }
-            if (o instanceof Response) {
-                preparedResponse = Response.mergeResponse(preparedResponse, (Response)o);
-            }
-            else {
-                preparedResponse.setResponseEntity(o);
-                preparedResponse.setResponseStatus(HttpResponseStatus.OK);
-            }
-            log.info("Response {{}}", preparedResponse.getResponseEntity());
         }
 
         if (route == null) {
@@ -97,5 +90,10 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         ctx.close();
     }
 
-
+    @Override
+    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
+        log.debug("remove session {}", SessionManager.getSession(ctx.channel()).getSessionId());
+        SessionManager.remove(ctx.channel());
+        ctx.close();
+    }
 }

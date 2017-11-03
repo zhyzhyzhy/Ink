@@ -29,7 +29,7 @@ public class Response {
 
     }
 
-    public Response(FullHttpRequest fullHttpRequest) {
+    public Response(Channel channel, FullHttpRequest fullHttpRequest) {
         final String[] sessionId = {null};
         if (fullHttpRequest.headers().contains("Cookie")) {
             ServerCookieDecoder.LAX.decode(fullHttpRequest.headers().get("Cookie"))
@@ -41,7 +41,7 @@ public class Response {
         }
         if (sessionId[0] == null) {
             sessionId[0] = SessionManager.createSessionId();
-            SessionManager.addSession(sessionId[0]);
+            SessionManager.addSession(channel, sessionId[0]);
             headers.put(SetCookie.toString(), "SessionId="+ sessionId[0]);
         }
     }

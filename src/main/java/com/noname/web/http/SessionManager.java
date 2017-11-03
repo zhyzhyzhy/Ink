@@ -15,16 +15,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class SessionManager {
 
     //存放HttpSession的sessionId，value
-    private static Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
+    private static Map<Channel, HttpSession> sessions = new ConcurrentHashMap<>();
 
 
-    private static Map<String, HttpSession> getSessions() {
+    private static Map<Channel, HttpSession> getSessions() {
         return sessions;
     }
 
-    static {
-        sessionClear();
-    }
 
     //create a random sessionId
     //一个简单的实现
@@ -33,38 +30,47 @@ public class SessionManager {
     }
 
     //往当前的EventLoop中存放
-    public static void addSession(String sessionId) {
-        Map<String, HttpSession> map = getSessions();
-        if (map.get(sessionId) == null) {
+    public static void addSession(Channel channel, String sessionId) {
+        Map<Channel, HttpSession> map = getSessions();
+        if (map.get(channel) == null) {
             HttpSession httpSession = new HttpSession();
             httpSession.setSessionId(sessionId);
-            map.put(httpSession.getSessionId(), httpSession);
+            map.put(channel, httpSession);
         }
     }
 
     //得到sessionId对应的session
-    public static HttpSession getSession(String sessionId) {
-        Map<String, HttpSession> map = getSessions();
-        return map.get(sessionId);
-    }
+//    public static HttpSession getSession(String sessionId) {
+//        Map<String, HttpSession> map = getSessions();
+//        return map.get(sessionId);
+//    }
 
-    //更新session
-    public static void updateSession(HttpSession session) {
-        Map<String, HttpSession> map = getSessions();
-        map.put(session.getSessionId(), session);
+    //得到channel对应的session
+    public static HttpSession getSession(Channel channel) {
+        Map<Channel, HttpSession> map = getSessions();
+        return map.get(channel);
     }
+//    //更新session
+//    public static void updateSession(HttpSession session) {
+//        Map<String, HttpSession> map = getSessions();
+//        map.put(session.getSessionId(), session);
+//    }
 
-    //清除过期session
-    public static void sessionClear() {
-        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-        Runnable action = () -> {
-            sessions.forEach((key, cookie) -> {
-                if (cookie.getExpiredTime() < System.currentTimeMillis()) {
-                    sessions.remove(key);
-                }
-            });
-        };
-        System.out.println("start ... ");
-        executor.scheduleAtFixedRate(action, 5, 1, TimeUnit.HOURS);
+//    //清除过期session
+//    public static void sessionClear() {
+//        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+//        Runnable action = () -> {
+//            sessions.forEach((key, cookie) -> {
+//                if (cookie.getExpiredTime() < System.currentTimeMillis()) {
+//                    sessions.remove(key);
+//                }
+//            });
+//        };
+//        System.out.println("start ... ");
+//        executor.scheduleAtFixedRate(action, 5, 1, TimeUnit.HOURS);
+//    }
+
+    public static void remove(Channel channel) {
+        sessions.remove(channel);
     }
 }

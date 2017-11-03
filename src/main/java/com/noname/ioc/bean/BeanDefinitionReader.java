@@ -6,7 +6,6 @@ import com.noname.NoNameConfigure;
 import com.noname.aop.annotation.Proxy;
 import com.noname.db.MybatisConfig;
 import com.noname.db.Service;
-import com.noname.filter.Filter;
 import com.noname.ioc.annotation.Bean;
 import com.noname.ioc.annotation.Component;
 import com.noname.ioc.annotation.Inject;
@@ -114,12 +113,7 @@ public class BeanDefinitionReader {
                     }
                     else {
                         Class<?> class1 = Class.forName(pack + "." + f.getName().replace(".class", ""));
-                        if (class1.getAnnotation(Component.class) != null
-                                || class1.getAnnotation(Controller.class) != null
-                                || class1.getAnnotation(Service.class) != null
-                                || class1.getAnnotation(Filter.class) != null
-                                || class1.getAnnotation(Proxy.class) != null
-                                ) {
+                        if (containBeanAnnotation(class1)) {
                             classList.add(class1);
                             this.register.registerBean(class1.newInstance());
                             log.info("register bean {}", class1);
@@ -136,6 +130,13 @@ public class BeanDefinitionReader {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean containBeanAnnotation(Class<?> clazz) {
+        return clazz.getAnnotation(Component.class) != null
+                || clazz.getAnnotation(Controller.class) != null
+                || clazz.getAnnotation(Service.class) != null
+                || clazz.getAnnotation(Proxy.class) != null;
     }
 
 }

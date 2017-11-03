@@ -3,7 +3,6 @@ package com.noname;
 import com.noname.aop.ProxyChain;
 import com.noname.aop.ProxyManager;
 import com.noname.db.MybatisConfig;
-import com.noname.filter.FilterUtil;
 import com.noname.ioc.context.IocContext;
 import com.noname.security.SecurityManager;
 import com.noname.server.NoNameServer;
@@ -30,7 +29,7 @@ public class NoName {
         //get all route info
         routes = RouteRegister.registerRoute(iocContext.getDefinitions());
 
-        FilterUtil.registerFilter(iocContext.getDefinitions());
+//        FilterUtil.registerFilter(iocContext.getDefinitions());
 
         ProxyManager.registerProxy(iocContext.getDefinitions(), routes);
 

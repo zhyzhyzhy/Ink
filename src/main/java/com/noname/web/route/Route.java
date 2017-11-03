@@ -22,9 +22,9 @@ public class Route {
     private boolean security = false;
 
     //Aop的前置路由
-    private ProxyChain beforeProxyChain = new ProxyChain();
+    private ProxyChain beforeProxyChain = new ProxyChain(true);
     //Aop的后置路由
-    private ProxyChain afterProxyChain = new ProxyChain();
+    private ProxyChain afterProxyChain = new ProxyChain(false);
 
     public ProxyChain getBeforeProxyChain() {
         return beforeProxyChain;

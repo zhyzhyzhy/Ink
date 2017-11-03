@@ -2,6 +2,10 @@ package com.noname.aop;
 
 import com.noname.aop.annotation.After;
 import com.noname.aop.annotation.Before;
+import com.noname.web.http.Request;
+import com.noname.web.http.Response;
+import com.noname.web.route.Route;
+import com.sun.deploy.net.proxy.ProxyUtils;
 
 import java.lang.reflect.Method;
 
@@ -10,23 +14,36 @@ public class ProxyEntity {
 
     //方法
     private Method proxyMethod;
+
     //方法所在的对象
-    private Object object;
+    private Object target;
 
     //参数
     private Object[] objects;
 
-    public ProxyEntity(Method proxyMethod, Object object) {
+
+    public ProxyEntity(Method proxyMethod, Object target) {
         this.proxyMethod = proxyMethod;
-        this.object = object;
+        this.target = target;
+        int i = proxyMethod.getParameterCount();
+        objects = new Object[i];
     }
 
-    public void doAction(Object[] objects) {
+    public boolean doAction(Request request, Response response, Route route) {
         proxyMethod.setAccessible(true);
         try {
-            proxyMethod.invoke(object, objects);
+            AopUtil.argsSetter(this,  route, request, response);
+            Object result = proxyMethod.invoke(target, objects);
+            if (result == null) {
+                return true;
+            }
+            else {
+                return (Boolean)result;
+            }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            return true;
         }
     }
 
@@ -39,11 +56,11 @@ public class ProxyEntity {
     }
 
     public Object getObject() {
-        return object;
+        return target;
     }
 
     public void setObject(Object object) {
-        this.object = object;
+        this.target = object;
     }
 
     public Object[] getObjects() {

@@ -22,7 +22,7 @@ public class HttpSession {
     private Map<String, Object> attributes;
 
     //过期时间，用于清除
-    private long expiredTime = new Date().getTime() + 10000;
+    private long expiredTime = System.currentTimeMillis() + 10000;
 
     public long getExpiredTime() {
         return expiredTime;
@@ -55,6 +55,7 @@ public class HttpSession {
     }
 
 
+    //lazy ini
     public void addAttribute(String key, String value) {
         if (attributes == null) {
             attributes = new HashMap<>();

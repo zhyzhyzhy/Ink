@@ -39,7 +39,6 @@ public class HttpResponseBuilder {
             fullHttpResponse.headers().set("Content-Type", "application/json;charset=utf-8");
         }
 
-        //session action
         fullHttpResponse.headers().add("Connection", "keep-alive");
         fullHttpResponse.headers().add("Content-Length", fullHttpResponse.content().array().length);
 

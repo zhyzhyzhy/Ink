@@ -14,14 +14,17 @@ public class Request {
 
     private FullHttpRequest fullHttpRequest;
 
+    private Channel channel;
+
     private String sessionId;
 
     private HttpSession session;
 
     private Map<String, Cookie> cookies = new HashMap<>();
 
-    public Request(FullHttpRequest fullHttpRequest) {
+    public Request(Channel channel, FullHttpRequest fullHttpRequest) {
         this.fullHttpRequest = fullHttpRequest;
+        this.channel = channel;
         //得到cookie
         parseCookies();
         //得到session
@@ -39,7 +42,7 @@ public class Request {
     private void parseSession() {
         Cookie sessionId = cookies.getOrDefault("SessionId", null);
         if (sessionId != null) {
-            session = SessionManager.getSession(sessionId.getValue());
+            session = SessionManager.getSession(this.channel);
         }
     }
 
