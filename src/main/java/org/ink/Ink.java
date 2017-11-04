@@ -14,15 +14,15 @@ import java.util.List;
 /**
  * Created by zhuyichen on 2017/7/11.
  */
-public class NoName {
+public class Ink {
 
-    private static final Logger log = LoggerFactory.getLogger(NoName.class);
+    private static final Logger log = LoggerFactory.getLogger(Ink.class);
 
     private NoNameServer noNameServer;
     private IocContext iocContext;
     private List<Route> routes;
 
-    public NoName(int port, Class<?> configure) {
+    public Ink(int port, Class<?> configure) {
         noNameServer = new NoNameServer(port);
         iocContext = new IocContext(configure);
 
@@ -32,7 +32,6 @@ public class NoName {
         //get all route info
         routes = RouteRegister.registerRoute(iocContext.getDefinitions());
 
-//        FilterUtil.registerFilter(iocContext.getDefinitions());
 
         ProxyManager.registerProxy(iocContext.getDefinitions(), routes);
 
@@ -40,11 +39,8 @@ public class NoName {
         //db configure
 //        MybatisConfig.configure(iocContext.getBean(configure));
 
-        //Mapper injection
 
         noNameServer.setList(routes);
-        log.info(WebConfig.getConfig("name"));
-
     }
     public void start() {
         noNameServer.start();

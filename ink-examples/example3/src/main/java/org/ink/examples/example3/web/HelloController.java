@@ -1,9 +1,9 @@
-package example2.web;
+package org.ink.examples.example3.web;
 
+import org.ink.examples.example3.domain.Student;
 import org.ink.security.annotation.Role;
 import org.ink.web.annotation.Controller;
 import org.ink.web.annotation.GET;
-import example1.User;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,16 +16,14 @@ import java.util.Map;
 @Controller
 public class HelloController {
 
-    @Role("ADMIN")
     @GET("/persons")
-    public List<User> getUsers() {
-        return new ArrayList<User>() {{
-            add(new User("zhuyichen", "hello", "cdscds"));
-            add(new User("maoshumin", "hello", "cdscds"));
-        }};
+    public List<Student> getUsers() {
+        ArrayList<Student> students =  new ArrayList<Student>();
+        students.add(new Student("zhuyichen", "hello"));
+        students.add(new Student("maoshumin", "hello"));
+        return students;
     }
 
-    @Role("STUDENT")
     @GET("/index")
     public Map<String, String> getIndex() {
         return Collections.singletonMap("hello", "world");

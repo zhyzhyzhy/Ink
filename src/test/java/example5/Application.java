@@ -1,15 +1,11 @@
 package example5;
 
-import org.ink.NoName;
-import org.ink.NoNameConfigure;
+import org.ink.Ink;
 
-public class Application extends NoNameConfigure {
-    @Override
-    public String[] beansPackage() {
-        return new String[]{"example5"};
-    }
+public class Application {
+
 
     public static void main(String[] args) {
-        new NoName(8091, Application.class).start();
+        new Ink(8091, Application.class).start();
     }
 }

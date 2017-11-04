@@ -1,7 +1,6 @@
 package org.ink.ioc.bean;
 
 
-import org.ink.NoNameConfigure;
 import org.ink.aop.annotation.Proxy;
 import org.ink.db.MybatisConfig;
 import org.ink.db.Service;
@@ -41,12 +40,15 @@ public class BeanDefinitionReader {
         try {
             Object object = configureClass.newInstance();
             this.register.registerBean(configureClass.newInstance());
-            NoNameConfigure configure = (NoNameConfigure)object;
-            MybatisConfig.configure(object);
-            for (String beanPackage : configure.beansPackage()) {
-                log.info("package {} is being scan", beanPackage);
-                addPackageToScan(beanPackage);
-            }
+            //丢弃
+//            NoNameConfigure configure = (NoNameConfigure)object;
+//            MybatisConfig.configure(object);
+//            for (String beanPackage : configure.beansPackage()) {
+//                log.info("package {} is being scan", beanPackage);
+//                addPackageToScan(beanPackage);
+//            }
+            log.info(configureClass.getPackage().getName());
+            addPackageToScan(configureClass.getPackage().getName());
         } catch (Exception e) {
             log.info("class {} did't implements NoNameConfigure.class", configureClass);
         } finally {
@@ -107,7 +109,7 @@ public class BeanDefinitionReader {
 
                     //如果还是个包，则继续扫描
                     if (f.isDirectory()) {
-                        addPackageToScan(pack + "/" + f.getName());
+                        addPackageToScan(pack + "." + f.getName());
                     }
                     else {
                         Class<?> class1 = Class.forName(pack + "." + f.getName().replace(".class", ""));

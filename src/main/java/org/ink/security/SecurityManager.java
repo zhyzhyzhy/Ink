@@ -1,6 +1,6 @@
 package org.ink.security;
 
-import org.ink.NoNameConfigure;
+import org.ink.WebConfig;
 import org.ink.db.Service;
 import org.ink.ioc.bean.BeanDefinition;
 import org.ink.ioc.context.IocContext;
@@ -39,11 +39,10 @@ public class SecurityManager {
         }
 
         Object ob = iocContext.getBean(configureclass);
-        if (ob instanceof NoNameConfigure) {
-            NoNameConfigure noNameConfigure = (NoNameConfigure) ob;
+        if (WebConfig.SECURITY_KEY != null) {
             iocContext.registerBean(new AuthenticationRoutes());
-            SecurityConfig.KEY = noNameConfigure.SecurityKey();
-            SecurityConfig.anthenticationOpen = noNameConfigure.anthenticationOpen();
+            SecurityConfig.KEY = WebConfig.SECURITY_KEY;
+            SecurityConfig.anthenticationOpen = true;
         }
 
 

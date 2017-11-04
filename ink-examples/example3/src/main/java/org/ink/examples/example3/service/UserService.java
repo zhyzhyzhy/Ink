@@ -1,4 +1,4 @@
-package example2.service;
+package org.ink.examples.example3.service;
 
 import org.ink.db.Service;
 import org.ink.security.User;

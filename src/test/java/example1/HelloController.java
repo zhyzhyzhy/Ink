@@ -1,6 +1,6 @@
 package example1;
 
-import org.ink.NoName;
+import org.ink.Ink;
 import org.ink.web.annotation.*;
 import org.ink.web.http.HttpHeader;
 import org.ink.web.http.Response;
@@ -54,6 +54,6 @@ public class HelloController {
     public static void main(String[] args) {
 
 
-         new NoName(8091, HelloController.class).start();
+         new Ink(8091, HelloController.class).start();
     }
 }

@@ -26,22 +26,27 @@ public class IocContext implements BeanDefinitionRegister {
         beanDefinitionReader.configure(configure);
     }
 
+    @Override
     public void registerBean(String name, Object object) {
         beanFactory.registerBean(name, object);
     }
 
+    @Override
     public void registerBean(Object object) {
         beanFactory.registerBean(object);
     }
 
+    @Override
     public <T> T getBean(String name) {
         return beanFactory.getBean(name);
     }
 
+    @Override
     public <T> T getBean(Class beanClass) {
         return beanFactory.getBean(beanClass);
     }
 
+    @Override
     public Map<String, BeanDefinition> getDefinitions() {
         return beanFactory.getContainer();
     }

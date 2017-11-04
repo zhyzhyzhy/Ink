@@ -1,5 +1,6 @@
 package org.ink.server.netty;
 
+import io.netty.util.CharsetUtil;
 import org.ink.exception.UnauthorizedException;
 import org.ink.web.http.HttpResponseBuilder;
 import org.ink.web.http.Request;
