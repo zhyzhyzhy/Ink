@@ -2,7 +2,7 @@ package org.ink;
 
 import org.ink.aop.ProxyManager;
 import org.ink.db.MybatisConfig;
-import org.ink.ioc.context.IocContext;
+import org.ink.ioc.IocContext;
 import org.ink.security.SecurityManager;
 import org.ink.server.InkServer;
 import org.ink.web.route.Route;

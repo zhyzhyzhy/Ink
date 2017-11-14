@@ -8,36 +8,48 @@ import org.ink.web.route.Route;
 
 import java.lang.reflect.Method;
 
-//在ProxyChain中的Node
+/**
+ * the node in the ProxyChain
+ * contains one proxy method and its object
+ *
+ * @author zhuyichen
+ * @see org.ink.aop.ProxyChain
+ */
+
 public class ProxyEntity {
 
-    //方法
+    /**
+     * method of the entity
+     */
     private Method proxyMethod;
 
-    //方法所在的对象
-    private Object target;
+    /**
+     * the object
+     */
+    private Object methodObject;
 
-    //参数
-    private Object[] objects;
+    /**
+     * the parameters of the methods
+     */
+    private Object[] parameters;
 
 
-    public ProxyEntity(Method proxyMethod, Object target) {
+    ProxyEntity(Method proxyMethod, Object target) {
         this.proxyMethod = proxyMethod;
-        this.target = target;
+        this.methodObject = target;
         int i = proxyMethod.getParameterCount();
-        objects = new Object[i];
+        parameters = new Object[i];
     }
 
-    public boolean doAction(Request request, Response response, Route route) {
+    boolean doAction(Request request, Response response, Route route) {
         proxyMethod.setAccessible(true);
         try {
-            AopUtil.argsSetter(this,  route, request, response);
-            Object result = proxyMethod.invoke(target, objects);
+            AopKit.argsSetter(this, route, request, response);
+            Object result = proxyMethod.invoke(methodObject, parameters);
             if (result == null) {
                 return true;
-            }
-            else {
-                return (Boolean)result;
+            } else {
+                return (Boolean) result;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -46,38 +58,29 @@ public class ProxyEntity {
         }
     }
 
+
     public Method getProxyMethod() {
         return proxyMethod;
     }
 
-    public void setProxyMethod(Method proxyMethod) {
-        this.proxyMethod = proxyMethod;
+    public Object[] getParameters() {
+        return parameters;
     }
 
-    public Object getObject() {
-        return target;
-    }
 
-    public void setObject(Object object) {
-        this.target = object;
-    }
-
-    public Object[] getObjects() {
-        return objects;
-    }
-
-    public void setObjects(Object[] objects) {
-        this.objects = objects;
-    }
 
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if (proxyMethod.getAnnotation(Before.class) != null) {
-            builder.append("before " + proxyMethod.getAnnotation(Before.class).value() + " ");
+            builder.append("before ")
+                    .append(proxyMethod.getAnnotation(Before.class).value())
+                    .append(" ");
         }
         if (proxyMethod.getAnnotation(After.class) != null) {
-            builder.append("After " + proxyMethod.getAnnotation(After.class).value());
+            builder.append("After ")
+                    .append(proxyMethod.getAnnotation(After.class).value())
+                    .append(" ");
         }
         return builder.toString();
     }

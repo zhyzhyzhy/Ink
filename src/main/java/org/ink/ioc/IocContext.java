@@ -1,4 +1,4 @@
-package org.ink.ioc.context;
+package org.ink.ioc;
 
 
 import org.ink.ioc.bean.BeanDefinition;

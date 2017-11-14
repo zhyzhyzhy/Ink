@@ -3,6 +3,8 @@ package org.ink.web.http;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,6 +13,8 @@ import java.util.Map;
  * Created by zhuyichen on 2017/7/12.
  */
 public class Request {
+
+    private static Logger logger = LoggerFactory.getLogger(Request.class);
 
     private FullHttpRequest fullHttpRequest;
 
@@ -42,7 +46,8 @@ public class Request {
     private void parseSession() {
         Cookie sessionId = cookies.getOrDefault("SessionId", null);
         if (sessionId != null) {
-            session = SessionManager.getSession(this.channel);
+            logger.debug(sessionId.getValue());
+            session = SessionManager.getSession(sessionId.getValue());
         }
     }
 

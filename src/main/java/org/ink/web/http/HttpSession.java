@@ -1,5 +1,6 @@
 package org.ink.web.http;
 
+import io.netty.channel.Channel;
 import org.ink.security.User;
 
 import java.util.HashMap;
@@ -18,6 +19,16 @@ public class HttpSession {
 
     //for personal attributes, lazy initialization
     private Map<String, Object> attributes;
+
+    private Channel channel;
+
+    public Channel channel() {
+        return channel;
+    }
+
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
 
     //过期时间，用于清除
     private long expiredTime = System.currentTimeMillis() + 10000;

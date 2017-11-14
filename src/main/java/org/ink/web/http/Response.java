@@ -35,7 +35,7 @@ public class Response {
         }
         if (sessionId[0] == null) {
             sessionId[0] = SessionManager.createSessionId();
-            SessionManager.addSession(channel, sessionId[0]);
+            SessionManager.addSession(sessionId[0], channel);
             headers.put(HttpHeader.SetCookie.toString(), "SessionId="+ sessionId[0]);
         }
     }

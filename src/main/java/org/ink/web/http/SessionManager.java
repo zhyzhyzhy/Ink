@@ -12,10 +12,12 @@ import java.util.concurrent.*;
 public class SessionManager {
 
     //存放HttpSession的sessionId，value
-    private static Map<Channel, HttpSession> sessions = new ConcurrentHashMap<>();
+//    private static Map<Channel, HttpSession> sessions = new ConcurrentHashMap<>();
 
+    //sessionid, httpSession
+    private static Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
 
-    private static Map<Channel, HttpSession> getSessions() {
+    private static Map<String, HttpSession> getSessions() {
         return sessions;
     }
 
@@ -27,26 +29,27 @@ public class SessionManager {
     }
 
     //往当前的EventLoop中存放
-    public static void addSession(Channel channel, String sessionId) {
-        Map<Channel, HttpSession> map = getSessions();
-        if (map.get(channel) == null) {
+    public static void addSession(String sessionId, Channel channel) {
+        Map<String, HttpSession> map = getSessions();
+        if (map.get(sessionId) == null) {
             HttpSession httpSession = new HttpSession();
             httpSession.setSessionId(sessionId);
-            map.put(channel, httpSession);
+            httpSession.setChannel(channel);
+            map.put(sessionId, httpSession);
         }
     }
 
     //得到sessionId对应的session
-//    public static HttpSession getSession(String sessionId) {
-//        Map<String, HttpSession> map = getSessions();
-//        return map.get(sessionId);
-//    }
+    public static HttpSession getSession(String sessionId) {
+        Map<String, HttpSession> map = getSessions();
+        return map.get(sessionId);
+    }
 
     //得到channel对应的session
-    public static HttpSession getSession(Channel channel) {
-        Map<Channel, HttpSession> map = getSessions();
-        return map.get(channel);
-    }
+//    public static HttpSession getSession(Channel channel) {
+//        Map<Channel, HttpSession> map = getSessions();
+//        return map.get(channel);
+//    }
 //    //更新session
 //    public static void updateSession(HttpSession session) {
 //        Map<String, HttpSession> map = getSessions();

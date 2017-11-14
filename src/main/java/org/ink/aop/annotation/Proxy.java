@@ -7,10 +7,9 @@ import java.lang.annotation.Target;
 
 
 /**
- *
- * is used in class level
- *
- *
+ * used in class level
+ * @see org.ink.aop.ProxyManager
+ * @author zhuyichen
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)

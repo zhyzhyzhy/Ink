@@ -8,14 +8,19 @@ import org.ink.web.route.Route;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * the proxychains in the route
+ *
+ * @author zhuyichen
+ */
 public class ProxyChain {
 
     private List<ProxyEntity> proxyEntities = new ArrayList<>();
 
-    private boolean isBeforeChain = false;
+    private ChainType chainType = ChainType.BEFORE;
 
-    public ProxyChain(boolean isBeforeChain) {
-        this.isBeforeChain = isBeforeChain;
+    public ProxyChain(ChainType chainType) {
+        this.chainType = chainType;
     }
 
     public void addProxyEntity(ProxyEntity proxyEntity) {
@@ -27,7 +32,7 @@ public class ProxyChain {
     }
 
     public boolean doChain(Request request, Response response, Route route) {
-        if (isBeforeChain) {
+        if (chainType.equals(ChainType.BEFORE)) {
             for (ProxyEntity entity : proxyEntities) {
                 if (!entity.doAction(request, response, route)) {
                     return false;

@@ -43,6 +43,11 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         Route route = null;
         try {
             route = RouteFinder.findRoute(fullHttpRequest);
+            if (route == null) {
+                HttpResponse exceptionResponse = HttpResponseBuilder.build(HttpResponseStatus.NOT_FOUND);
+                channelHandlerContext.write(exceptionResponse);
+                return;
+            }
             RouteSetter.routeSetter(route, fullHttpRequest);
         } catch (UnauthorizedException ignored) {
             HttpResponse exceptionResponse = HttpResponseBuilder.build(HttpResponseStatus.UNAUTHORIZED);
@@ -96,10 +101,4 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         ctx.close();
     }
 
-    @Override
-    public void channelUnregistered(ChannelHandlerContext ctx) throws Exception {
-        log.debug("remove session {}", SessionManager.getSession(ctx.channel()).getSessionId());
-        SessionManager.remove(ctx.channel());
-        ctx.close();
-    }
 }

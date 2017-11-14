@@ -10,12 +10,15 @@ import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.Map;
 
-public class AopUtil {
+/**
+ *
+ */
+public class AopKit {
 
     public static void argsSetter(ProxyEntity proxyEntity, Route route, Request request, Response response) {
         Method method = proxyEntity.getProxyMethod();
 
-        Object[] proxyObjects = proxyEntity.getObjects();
+        Object[] proxyObjects = proxyEntity.getParameters();
         Object[] routeObjects = route.getParamters();
         Parameter[] routeParameters = route.getMethod().getParameters();
         Parameter[] proxyParameters = method.getParameters();

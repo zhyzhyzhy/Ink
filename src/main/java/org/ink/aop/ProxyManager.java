@@ -15,13 +15,49 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+/**
+ * function registerProxy is looking for
+ * class with annotation {@code @Proxy}
+ * then looking for methods that has
+ * annotation {@code @Before }, set it in {@code beforeMap}
+ *
+ * looking for methods that has annotation {@code After},
+ * set it in {@code afterMap}
+ *
+ * all methods and its object is created into a ProxyEntity
+ *
+ * every route has one beforeAopChain and one afterAopChain
+ * we need to set the methods in the target route with the rule
+ * setted in annotation values
+ *
+ * @see org.ink.aop.annotation.After
+ * @see org.ink.aop.annotation.Before
+ * @see org.ink.aop.annotation.Proxy
+ * @see org.ink.aop.ProxyEntity
+ * @see org.ink.aop.ProxyChain
+ * @author zhuyichen
+ */
 public class ProxyManager {
 
     private static final Logger log = LoggerFactory.getLogger(ProxyManager.class);
 
+    /**
+     * contains methods has annotation @Before
+     */
     private static Map<Pattern, ProxyEntity> beforeMap = new HashMap<>();
+
+    /**
+     * contains methods has annotation @After
+     */
     private static Map<Pattern, ProxyEntity> afterMap = new HashMap<>();
 
+
+    /**
+     * set all Aop methods in the maps
+     * then set into target route ProxyChains
+     * @param map the bean container in the IocContext
+     * @param routes all routes in the project
+     */
     public static void registerProxy(Map<String, BeanDefinition> map, List<Route> routes) {
         Collection<BeanDefinition> beanDefinitions = map.values();
 
@@ -50,11 +86,15 @@ public class ProxyManager {
                     }
                 });
 
+        //set all proxy methods in the target route
         registerProxyChains(routes);
-
     }
 
-    public static void registerProxyChains(List<Route> routes) {
+    /**
+     * set all proxy methods in the target route
+     * @param routes all routes in the project
+     */
+    private static void registerProxyChains(List<Route> routes) {
         routes.forEach(route -> {
             beforeMap.forEach((pattern, proxyEntity) -> {
                 if (pattern.matcher(route.getPath()).matches()) {

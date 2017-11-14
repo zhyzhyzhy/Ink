@@ -12,6 +12,8 @@ import org.ink.exception.UnauthorizedException;
 import org.ink.security.JwtInfo;
 import org.ink.security.SecurityManager;
 import org.ink.web.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.annotation.Annotation;
@@ -22,9 +24,12 @@ import java.util.Map;
 
 public final class RouteSetter {
 
-    public static void routeSetter(Route route, FullHttpRequest fullHttpRequest) throws UnauthorizedException{
+    private static final Logger logger = LoggerFactory.getLogger(RouteSetter.class);
+
+    public static void routeSetter(Route route, FullHttpRequest fullHttpRequest) throws UnauthorizedException {
         String path = fullHttpRequest.uri();
         HttpMethod method = fullHttpRequest.method();
+
 
         if (route.isSecurity()) {
             JwtInfo jwtInfo = SecurityManager.check(fullHttpRequest, route);
@@ -128,6 +133,7 @@ public final class RouteSetter {
                 }
             }
         }
+
     }
 
     //处理@POSTParam参数

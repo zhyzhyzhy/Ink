@@ -3,7 +3,7 @@ package org.ink.security;
 import org.ink.WebConfig;
 import org.ink.db.Service;
 import org.ink.ioc.bean.BeanDefinition;
-import org.ink.ioc.context.IocContext;
+import org.ink.ioc.IocContext;
 import org.ink.security.annotation.Role;
 import org.ink.security.annotation.UserDetail;
 import org.ink.web.route.Route;
