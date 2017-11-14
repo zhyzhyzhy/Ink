@@ -2,6 +2,7 @@ package org.ink.server.netty;
 
 import io.netty.util.CharsetUtil;
 import org.ink.exception.UnauthorizedException;
+import org.ink.web.WebContext;
 import org.ink.web.http.HttpResponseBuilder;
 import org.ink.web.http.Request;
 import org.ink.web.http.Response;
@@ -11,6 +12,7 @@ import org.ink.web.route.RouteFinder;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
+import org.ink.web.route.RouteSetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,15 +32,18 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         if (fullHttpRequest == null) {
             return;
         }
-        log.info("Request [{}]", fullHttpRequest.uri());
 
+        log.info("Request [{}]", fullHttpRequest.uri());
         Request request = new Request(channelHandlerContext.channel(), fullHttpRequest);
+
+        WebContext.setCurrentSession(request.getSession());
 
         Response preparedResponse = new Response(channelHandlerContext.channel(), fullHttpRequest);
 
         Route route = null;
         try {
-             route = RouteFinder.findRoute(fullHttpRequest);
+            route = RouteFinder.findRoute(fullHttpRequest);
+            RouteSetter.routeSetter(route, fullHttpRequest);
         } catch (UnauthorizedException ignored) {
             HttpResponse exceptionResponse = HttpResponseBuilder.build(HttpResponseStatus.UNAUTHORIZED);
             channelHandlerContext.write(exceptionResponse);

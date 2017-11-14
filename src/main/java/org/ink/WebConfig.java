@@ -1,6 +1,5 @@
 package org.ink;
 
-import org.apache.ibatis.datasource.pooled.PooledDataSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,6 +12,17 @@ import java.util.Properties;
  * load the configure file
  * the main method is in the static block
  *
+ * <p>config and their name</p>
+ * <ul>
+ *     <li>security_key             for SECURITY_KEY</li>
+ *     <li>datasource_url           for DATASOURCE_URL</li>
+ *     <li>datasource_driver        for DATASOURCE_DRIVER</li>
+ *     <li>datasource_username      for DATASOURCE_USERNAME</li>
+ *     <li>datasource_password      for DATASOURCE_PASSWORD</li>
+ *     <li>mybatis_config_file_name for MYBATIS_CONFIG_FILE_NAME</li>
+ *     <li>mybatis_environment      for MYBATIS_ENVIRONMENT</li>
+ * </ul>
+ *
  * @author zhuyichen
  */
 public class WebConfig {
@@ -20,22 +30,16 @@ public class WebConfig {
     private static final Properties properties = new Properties();
     private static final Logger log = LoggerFactory.getLogger(WebConfig.class);
 
-    //securitykey =
+
     public static String SECURITY_KEY;
     private static final String DEFAULT_SECURITY = "Ink";
 
-    //datasource_url =
     public static String DATASOURCE_URL;
-    //datasource_driver =
     public static String DATASOURCE_DRIVER;
-    //datasource_username =
     public static String DATASOURCE_USERNAME;
-    //datasource_password =
     public static String DATASOURCE_PASSWORD;
 
-    //mybatis_config_file_name =
     public static String MYBATIS_CONFIG_FILE_NAME;
-    //mybatis_environment =
     public static String MYBATIS_ENVIRONMENT;
 
     static {
@@ -43,7 +47,7 @@ public class WebConfig {
             InputStream inputStream = getClassLoader().getResourceAsStream("app.properties");
             InputStreamReader reader = new InputStreamReader(inputStream);
             properties.load(reader);
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.info("No Config File Mode");
         }
     }

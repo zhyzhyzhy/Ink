@@ -1,9 +1,7 @@
 package org.ink.web.http;
 
-import java.util.Date;
-
 /**
- * Created by zhuyichen on 2017/8/18.
+ * @author zhuyichen
  */
 public class Cookie {
 

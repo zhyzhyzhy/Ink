@@ -41,8 +41,8 @@ public class Application {
             }
         }
 
-        final Person p1 = new Person("zhuyichen", 19);
-        final Person p2 = new Person("guigui", 20);
+        final Person p1 = new Person("Jack", 19);
+        final Person p2 = new Person("Lee", 20);
         List<Person> list = new LinkedList<Person>() {{
             add(p1);
             add(p2);
@@ -51,8 +51,6 @@ public class Application {
     }
 
     public static void main(String[] args) {
-        String name = "hello,world";
-        String age = "19";
         new NoName(8082, Application.class).start();
     }
 }

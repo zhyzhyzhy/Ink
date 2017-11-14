@@ -13,17 +13,17 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 
 /**
- * Created by zhuyichen on 2017/7/11.
+ * @author zhuyichen
  */
-public class NoNameServer {
-    private final Logger log = LoggerFactory.getLogger(NoNameServer.class);
+public class InkServer {
+    private final Logger log = LoggerFactory.getLogger(InkServer.class);
     private int port;
     private List<Route> list;
 
-    public NoNameServer() {
+    public InkServer() {
         this.port = 8000;
     }
-    public NoNameServer(int port) {
+    public InkServer(int port) {
         this.port = port;
     }
     public void start() {

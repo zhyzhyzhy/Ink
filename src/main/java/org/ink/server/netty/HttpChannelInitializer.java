@@ -12,7 +12,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
 import java.util.List;
 
 /**
- * Created by zhuyichen on 2017/7/11.
+ * @author zhuyichen
  */
 public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
     private List<Route> list;

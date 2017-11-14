@@ -20,7 +20,7 @@ public class HelloController {
     public List<Student> getUsers() {
         ArrayList<Student> students =  new ArrayList<Student>();
         students.add(new Student("zhuyichen", "hello"));
-        students.add(new Student("maoshumin", "hello"));
+        students.add(new Student("wangshukang", "hello"));
         return students;
     }
 
