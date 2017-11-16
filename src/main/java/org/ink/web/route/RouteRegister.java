@@ -35,7 +35,7 @@ public class RouteRegister {
         for (String key : beanDefinitionMap.keySet()) {
 
             BeanDefinition beanDefinition = beanDefinitionMap.get(key);
-            Method[] methods = beanDefinition.getBeanClassName().getDeclaredMethods();
+            Method[] methods = beanDefinition.getClazz().getDeclaredMethods();
 
             for (Method method : methods) {
 

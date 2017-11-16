@@ -23,7 +23,7 @@ public class ProxyChain {
         this.chainType = chainType;
     }
 
-    public void addProxyEntity(ProxyEntity proxyEntity) {
+    void addProxyEntity(ProxyEntity proxyEntity) {
         proxyEntities.add(proxyEntity);
     }
 
@@ -38,8 +38,7 @@ public class ProxyChain {
                     return false;
                 }
             }
-        }
-        else {
+        } else {
             for (ProxyEntity entity : proxyEntities) {
                 entity.doAction(request, response, route);
             }

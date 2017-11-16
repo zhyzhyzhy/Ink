@@ -12,6 +12,7 @@ public class BeanFactory implements BeanDefinitionRegister {
     public BeanFactory() {
     }
 
+    @Override
     public void registerBean(String name, Object object) {
         if (!container.containsKey(name)) {
             BeanDefinition bean = new BeanDefinition(object.getClass(), object);
@@ -19,10 +20,12 @@ public class BeanFactory implements BeanDefinitionRegister {
         }
     }
 
+    @Override
     public void registerBean(Object object) {
         registerBean(object.getClass().getName(), object);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getBean(String name) {
         if (container.containsKey(name)) {
@@ -31,16 +34,18 @@ public class BeanFactory implements BeanDefinitionRegister {
         return null;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T getBean(Class beanClass) {
         for (BeanDefinition class1 : container.values()) {
-            if (class1.getBeanClassName() == beanClass) {
+            if (class1.getClazz() == beanClass) {
                 return (T) class1.getObject();
             }
         }
         return null;
     }
 
+    @Override
     public Map<String, BeanDefinition> getDefinitions() {
         return container;
     }

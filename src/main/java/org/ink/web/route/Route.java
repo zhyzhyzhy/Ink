@@ -1,6 +1,7 @@
 package org.ink.web.route;
 
 
+import org.ink.aop.ChainType;
 import org.ink.aop.ProxyChain;
 import io.netty.handler.codec.http.HttpMethod;
 
@@ -22,9 +23,9 @@ public class Route {
     private boolean security = false;
 
     //Aop的前置路由
-    private ProxyChain beforeProxyChain = new ProxyChain(true);
+    private ProxyChain beforeProxyChain = new ProxyChain(ChainType.BEFORE);
     //Aop的后置路由
-    private ProxyChain afterProxyChain = new ProxyChain(false);
+    private ProxyChain afterProxyChain = new ProxyChain(ChainType.AFTER);
 
     public ProxyChain getBeforeProxyChain() {
         return beforeProxyChain;

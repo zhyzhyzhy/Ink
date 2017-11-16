@@ -34,6 +34,7 @@ public class Ink {
         //get all route info
         routes = RouteRegister.registerRoute(iocContext.getDefinitions());
 
+        //register proxy methods
         ProxyManager.registerProxy(iocContext.getDefinitions(), routes);
 
         MybatisConfig.configure(iocContext.getBean(configure));

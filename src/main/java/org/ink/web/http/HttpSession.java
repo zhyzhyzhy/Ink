@@ -64,7 +64,7 @@ public class HttpSession {
     }
 
 
-    //lazy ini
+    //lazy init
     public void addAttribute(String key, String value) {
         if (attributes == null) {
             attributes = new HashMap<>();

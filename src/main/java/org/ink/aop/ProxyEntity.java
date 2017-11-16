@@ -53,20 +53,18 @@ public class ProxyEntity {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
             return true;
         }
     }
 
 
-    public Method getProxyMethod() {
+    Method getProxyMethod() {
         return proxyMethod;
     }
 
-    public Object[] getParameters() {
+    Object[] getParameters() {
         return parameters;
     }
-
 
 
     @Override

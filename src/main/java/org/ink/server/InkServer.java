@@ -17,6 +17,7 @@ import java.util.List;
  */
 public class InkServer {
     private final Logger log = LoggerFactory.getLogger(InkServer.class);
+
     private int port;
     private List<Route> list;
 

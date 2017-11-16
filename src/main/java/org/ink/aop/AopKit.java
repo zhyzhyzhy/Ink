@@ -12,10 +12,14 @@ import java.util.Map;
 
 /**
  *
+ * set args in Aop methods
+ *
+ * @author zhuyichen
  */
-public class AopKit {
+class AopKit {
 
-    public static void argsSetter(ProxyEntity proxyEntity, Route route, Request request, Response response) {
+     static void argsSetter(ProxyEntity proxyEntity, Route route, Request request, Response response) {
+
         Method method = proxyEntity.getProxyMethod();
 
         Object[] proxyObjects = proxyEntity.getParameters();

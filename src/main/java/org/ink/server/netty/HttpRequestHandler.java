@@ -1,12 +1,10 @@
 package org.ink.server.netty;
 
-import io.netty.util.CharsetUtil;
 import org.ink.exception.UnauthorizedException;
 import org.ink.web.WebContext;
 import org.ink.web.http.HttpResponseBuilder;
 import org.ink.web.http.Request;
 import org.ink.web.http.Response;
-import org.ink.web.http.SessionManager;
 import org.ink.web.route.Route;
 import org.ink.web.route.RouteFinder;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,7 +15,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Created by zhuyichen on 2017/7/11.
+ *
+ * @author zhuyichen  2017/7/11.
  */
 public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
@@ -25,20 +24,42 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+
     }
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
+
         if (fullHttpRequest == null) {
             return;
         }
 
         log.info("Request [{}]", fullHttpRequest.uri());
+
+        /**
+         * build the request
+         * if is the first request then create the session
+         */
         Request request = new Request(channelHandlerContext.channel(), fullHttpRequest);
 
+
+        /**
+         *
+         * TODO
+         *
+         * 怎么传递set-cookie头。。。。。。。。。。。
+         * 。。。。。。。。。。。。。。。
+         * 。。。。。。。。。。。。。。。。。
+         * 。。。。。。。。。。。。。。。。。
+         * 。。。。。。。。。。。。。。。。。。
+         *
+         *
+         *
+         */
+        //set current session
         WebContext.setCurrentSession(request.getSession());
 
-        Response preparedResponse = new Response(channelHandlerContext.channel(), fullHttpRequest);
+        Response preparedResponse = new Response(channelHandlerContext.channel(), request);
 
         Route route = null;
         try {
@@ -55,38 +76,32 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             return;
         }
 
-        if (route != null) {
-            Boolean continueProcess = true;
-            //before aop
-            if (route.getBeforeProxyChain().size() != 0) {
-                continueProcess = route.getBeforeProxyChain().doChain(request, preparedResponse, route);
-            }
-
-            if (continueProcess) {
-                Object o = route.getMethod().invoke(route.getObject(), route.getParamters());
-
-                //after aop
-                if (route.getAfterProxyChain().size() != 0) {
-                    route.getAfterProxyChain().doChain(request, preparedResponse, route);
-                }
-
-                if (o instanceof Response) {
-                    preparedResponse = Response.mergeResponse(preparedResponse, (Response) o);
-                } else {
-                    preparedResponse.setResponseEntity(o);
-                    preparedResponse.setResponseStatus(HttpResponseStatus.OK);
-                }
-                log.info("Response {{}}", preparedResponse.getResponseEntity());
-            }
+        Boolean continueProcess = true;
+        //before aop
+        if (route.getBeforeProxyChain().size() != 0) {
+            continueProcess = route.getBeforeProxyChain().doChain(request, preparedResponse, route);
         }
 
-        if (route == null) {
-            HttpResponse response = HttpResponseBuilder.build(HttpResponseStatus.NOT_FOUND);
-            channelHandlerContext.write(response);
-        } else {
-            FullHttpResponse response = HttpResponseBuilder.build(channelHandlerContext.channel(), preparedResponse);
-            channelHandlerContext.write(response);
+        if (continueProcess) {
+            Object o = route.getMethod().invoke(route.getObject(), route.getParamters());
+
+            //after aop
+            if (route.getAfterProxyChain().size() != 0) {
+                route.getAfterProxyChain().doChain(request, preparedResponse, route);
+            }
+
+            if (o instanceof Response) {
+                preparedResponse = Response.mergeResponse(preparedResponse, (Response) o);
+            } else {
+                preparedResponse.setResponseEntity(o);
+                preparedResponse.setResponseStatus(HttpResponseStatus.OK);
+            }
+            log.info("Response {{}}", preparedResponse.getResponseEntity());
         }
+
+
+        FullHttpResponse response = HttpResponseBuilder.build(channelHandlerContext.channel(), preparedResponse);
+        channelHandlerContext.write(response);
 
     }
 

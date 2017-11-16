@@ -24,20 +24,11 @@ public class Response {
     }
 
     public Response(Channel channel, FullHttpRequest fullHttpRequest) {
-        final String[] sessionId = {null};
-        if (fullHttpRequest.headers().contains("Cookie")) {
-            ServerCookieDecoder.LAX.decode(fullHttpRequest.headers().get("Cookie"))
-                    .forEach(cookie -> {
-                        if (cookie.name().equals("SessionId")) {
-                            sessionId[0] = cookie.value();
-                        }
-                    });
-        }
-        if (sessionId[0] == null) {
-            sessionId[0] = SessionManager.createSessionId();
-            SessionManager.addSession(sessionId[0], channel);
-            headers.put(HttpHeader.SetCookie.toString(), "SessionId="+ sessionId[0]);
-        }
+
+    }
+
+    public Response(Channel channel, Request request) {
+
     }
 
     public Map<String, String> getHeaders() {

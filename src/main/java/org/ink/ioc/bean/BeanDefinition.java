@@ -1,54 +1,69 @@
 package org.ink.ioc.bean;
 
-import java.util.Collections;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * Created by zhy on 2017/4/9.
+ * info for one class
+ * contains beanName, like {@code @Bean(name = "demo"} default is {@code class.getName()}
  *
- * 存取一个bean的信息
+ * contains beanClass the object of the bean's class
+ *
+ * contains bean's object
+
+ *
+ * @author zhuyichen
+ * since 2017.4.9
  */
 public class BeanDefinition {
 
-    //bean名字
-    private String beanName;
+    /**
+     * bean's name
+     * can set by {@code Bean(name = ""}
+     * or default is {@code class.getName()}
+     */
+    private String name;
 
-    //bean的实际class
-    private Class beanClassName;
+    /**
+     * the class of the bean
+     */
+    private Class clazz;
 
-    //bean的实例
+    /**
+     * the object of the bean
+     */
     private Object object;
 
-    //是否是单例的
-    private boolean isSingleton = false;
+    /**
+     * singleton
+     * default is false
+     */
+    private boolean singleton = false;
 
-    public BeanDefinition() {
-
-    }
 
     public BeanDefinition(Class beanClassName, Object object) {
         this(beanClassName.getName(), beanClassName, object);
     }
 
-    public BeanDefinition(String beanName, Class beanClassName, Object object) {
-        this.beanName = beanName;
-        this.beanClassName = beanClassName;
+    public BeanDefinition(String name, Class clazz, Object object) {
+        this.name = name;
+        this.clazz = clazz;
         this.object = object;
     }
 
-    public String getBeanName() {
-        return beanName;
+    public String getName() {
+        return name;
     }
 
-    public void setBeanName(String beanName) {
-        this.beanName = beanName;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Class getBeanClassName() {
-        return beanClassName;
+    public Class getClazz() {
+        return clazz;
     }
 
-    public void setBeanClassName(Class beanClassName) {
-        this.beanClassName = beanClassName;
+    public void setClazz(Class clazz) {
+        this.clazz = clazz;
     }
 
     public Object getObject() {
@@ -61,10 +76,12 @@ public class BeanDefinition {
 
     @Override
     public String toString() {
-        return "BeanDefinition{" +
-                "beanClassName=" + beanClassName +
-                ", object=" + object +
-                '}';
+        return new ToStringBuilder(this)
+                .append("name", name)
+                .append("clazz", clazz)
+                .append("object", object)
+                .append("singleton", singleton)
+                .toString();
     }
 }
 

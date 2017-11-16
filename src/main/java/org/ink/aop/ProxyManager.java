@@ -62,10 +62,10 @@ public class ProxyManager {
         Collection<BeanDefinition> beanDefinitions = map.values();
 
         beanDefinitions.stream()
-                .filter(bd -> bd.getBeanClassName().getAnnotation(Proxy.class) != null)
+                .filter(bd -> bd.getClazz().getAnnotation(Proxy.class) != null)
                 .forEach(bd -> {
                     //get all methods
-                    Method[] methods = bd.getBeanClassName().getMethods();
+                    Method[] methods = bd.getClazz().getMethods();
                     for (Method method : methods) {
                         // handle Before Aop
                         if (method.getAnnotation(Before.class) != null) {

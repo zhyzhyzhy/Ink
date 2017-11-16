@@ -3,6 +3,7 @@ package org.ink.web.http;
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
+import org.ink.web.WebContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by zhuyichen on 2017/7/12.
+ * @author zhuyichen on 2017/7/12.
  */
 public class Request {
 
@@ -20,33 +21,33 @@ public class Request {
 
     private Channel channel;
 
-    private String sessionId;
-
     private HttpSession session;
 
+    //key -> Cookie
     private Map<String, Cookie> cookies = new HashMap<>();
 
     public Request(Channel channel, FullHttpRequest fullHttpRequest) {
         this.fullHttpRequest = fullHttpRequest;
         this.channel = channel;
-        //得到cookie
-        parseCookies();
-        //得到session
+        //get cookie and set session
         parseSession();
     }
 
-    private void parseCookies() {
+    private void parseSession() {
         //use ServerCookieDecoder to decode cookies in headers
         if (fullHttpRequest.headers().contains("Cookie")) {
-            ServerCookieDecoder.LAX.decode(fullHttpRequest.headers().get("Cookie"))
-                    .forEach(cookie -> cookies.putIfAbsent(cookie.name(), new Cookie(cookie)));
+            ServerCookieDecoder.STRICT.decode(fullHttpRequest.headers().get("Cookie"))
+                    .forEach(cookie -> cookies.putIfAbsent(cookie.name(), new Cookie(cookie.name(), cookie.value())));
         }
-    }
 
-    private void parseSession() {
-        Cookie sessionId = cookies.getOrDefault("SessionId", null);
-        if (sessionId != null) {
-            logger.debug(sessionId.getValue());
+        Cookie sessionId = cookies.getOrDefault("sessionid", null);
+
+        if (sessionId == null) {
+            String sessionid = SessionManager.createSessionId();
+            SessionManager.addSession(sessionid, channel);
+            session = SessionManager.getSession(sessionid);
+        }
+        else {
             session = SessionManager.getSession(sessionId.getValue());
         }
     }
@@ -56,7 +57,7 @@ public class Request {
         return cookies;
     }
 
-    public String getUri() {
+    public String uri() {
         return fullHttpRequest.uri();
     }
 
