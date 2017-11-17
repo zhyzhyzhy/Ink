@@ -5,22 +5,53 @@ import org.ink.security.User;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Created by zhuyichen on 2017/8/15.
+ * @author zhuyichen 2017-8-15
  */
 public class HttpSession {
 
-    //sessionId
+    /*
+     * session id
+     */
+
     private String sessionId;
 
-    //对应的身份验证，如果无就是null
+    /*
+     * for security
+     */
+
     private User user;
 
-    //for personal attributes, lazy initialization
+    /**
+     * for personal attributes, lazy initialization
+     */
     private Map<String, Object> attributes;
 
     private Channel channel;
+
+    private long createTime = System.currentTimeMillis();
+    private long maxAge = 2*60*60;
+
+    public HttpSession() {
+
+    }
+
+    public void setMaxAge(long maxAge) {
+        this.maxAge = maxAge;
+    }
+
+    public long maxAge() {
+        return maxAge;
+    }
+
+    /**
+     * judge current session has expires
+     */
+    public boolean hasExpires() {
+        return createTime + TimeUnit.SECONDS.toMillis(maxAge) <= System.currentTimeMillis();
+    }
 
     public Channel channel() {
         return channel;
@@ -30,24 +61,11 @@ public class HttpSession {
         this.channel = channel;
     }
 
-    //过期时间，用于清除
-    private long expiredTime = System.currentTimeMillis() + 10000;
-
-    public long getExpiredTime() {
-        return expiredTime;
-    }
-
-    public void setExpiredTime(long expiredTime) {
-        this.expiredTime = expiredTime;
-    }
-
-    public HttpSession(){}
-
     public HttpSession(String sessionId) {
         this.sessionId = sessionId;
     }
 
-    public String getSessionId() {
+    public String sessionId() {
         return sessionId;
     }
 
@@ -55,7 +73,7 @@ public class HttpSession {
         this.sessionId = sessionId;
     }
 
-    public User getUser() {
+    public User user() {
         return user;
     }
 
@@ -64,7 +82,9 @@ public class HttpSession {
     }
 
 
-    //lazy init
+    /**
+     * lazy init attributes
+     */
     public void addAttribute(String key, String value) {
         if (attributes == null) {
             attributes = new HashMap<>();

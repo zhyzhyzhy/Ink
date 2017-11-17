@@ -28,6 +28,7 @@ public class InkServer {
         this.port = port;
     }
     public void start() {
+
         EventLoopGroup boss = new NioEventLoopGroup(1);
         EventLoopGroup worker = new NioEventLoopGroup();
         try {

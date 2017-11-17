@@ -5,6 +5,7 @@ import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import org.ink.exception.UnauthorizedException;
 import org.ink.web.annotation.PathVariable;
+import org.ink.web.http.Request;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -14,7 +15,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
- * Created by zhuyichen on 2017/7/12.
+ * @author zhuyichen 2017-7-12
  */
 public class RouteFinder {
 
@@ -52,10 +53,10 @@ public class RouteFinder {
     }
 
 
-    public static Route findRoute(FullHttpRequest fullHttpRequest) throws UnauthorizedException {
+    public static Route findRoute(Request request) throws UnauthorizedException {
 
-        String path = fullHttpRequest.uri();
-        HttpMethod method = fullHttpRequest.method();
+        String path = request.uri();
+        HttpMethod method = request.method();
 
 
         //如果有params，找到问号的位置

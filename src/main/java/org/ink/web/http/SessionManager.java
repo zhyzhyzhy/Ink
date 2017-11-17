@@ -7,30 +7,26 @@ import java.util.UUID;
 import java.util.concurrent.*;
 
 /**
- * Created by zhuyichen on 2017/8/15.
+ * @author zhuyichen 2017-8-15
  */
-public class SessionManager {
+public final class SessionManager {
 
-    //存放HttpSession的sessionId，value
-//    private static Map<Channel, HttpSession> sessions = new ConcurrentHashMap<>();
-
-    //sessionid, httpSession
+    //sessionid -> httpSession
     private static Map<String, HttpSession> sessions = new ConcurrentHashMap<>();
 
-    private static Map<String, HttpSession> getSessions() {
+    private static Map<String, HttpSession> sessions() {
         return sessions;
     }
 
-
-    //create a random sessionId
-    //一个简单的实现
-    public static String createSessionId() {
-        return UUID.randomUUID().toString().replaceAll("-", "");
+    /**
+     * get a random sessionId
+     */
+    static String createSessionId() {
+        return HttpKit.createUniqueId();
     }
 
-    //往当前的EventLoop中存放
-    public static void addSession(String sessionId, Channel channel) {
-        Map<String, HttpSession> map = getSessions();
+    static void addSession(String sessionId, Channel channel) {
+        Map<String, HttpSession> map = sessions();
         if (map.get(sessionId) == null) {
             HttpSession httpSession = new HttpSession();
             httpSession.setSessionId(sessionId);
@@ -39,22 +35,17 @@ public class SessionManager {
         }
     }
 
-    //得到sessionId对应的session
-    public static HttpSession getSession(String sessionId) {
-        Map<String, HttpSession> map = getSessions();
+    /**
+     * get target httpSession by sessionId
+     */
+    static HttpSession getSession(String sessionId) {
+        Map<String, HttpSession> map = sessions();
         return map.get(sessionId);
     }
 
-    //得到channel对应的session
-//    public static HttpSession getSession(Channel channel) {
-//        Map<Channel, HttpSession> map = getSessions();
-//        return map.get(channel);
-//    }
-//    //更新session
-//    public static void updateSession(HttpSession session) {
-//        Map<String, HttpSession> map = getSessions();
-//        map.put(session.getSessionId(), session);
-//    }
+    static boolean containsSession(String sessionId) {
+        return sessions.containsKey(sessionId);
+    }
 
 //    //清除过期session
 //    public static void sessionClear() {
@@ -70,7 +61,12 @@ public class SessionManager {
 //        executor.scheduleAtFixedRate(action, 5, 1, TimeUnit.HOURS);
 //    }
 
-    public static void remove(Channel channel) {
-        sessions.remove(channel);
+
+    /**
+     * remove target session by sessionid
+     */
+    public static void remove(String sessionid) {
+        sessions.remove(sessionid);
     }
+
 }

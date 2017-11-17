@@ -1,6 +1,8 @@
 package org.ink.web;
 
 import org.ink.web.http.HttpSession;
+import org.ink.web.http.Request;
+import org.ink.web.http.Response;
 
 /**
  * the methods for current context
@@ -10,14 +12,16 @@ import org.ink.web.http.HttpSession;
 public final class WebContext {
 
 
-    private static final ThreadLocal<HttpSession> SESSIONS = new ThreadLocal<>();
+    private static final ThreadLocal<HttpSession> SESSION = new ThreadLocal<>();
+    private static final ThreadLocal<Response> RESPONSE = new ThreadLocal<>();
+    private static final ThreadLocal<Request> REQUEST = new ThreadLocal<>();
 
     /**
      * set current session
      * @param session current session context
      */
     public static void setCurrentSession(HttpSession session) {
-        SESSIONS.set(session);
+        SESSION.set(session);
     }
 
     /**
@@ -25,14 +29,37 @@ public final class WebContext {
      * @return current session context
      */
     public static HttpSession currentSession() {
-        return SESSIONS.get();
+        return SESSION.get();
     }
 
+    /**
+     *  set current response
+     */
+    public static void setCurrentResponse(Response response) {
+        RESPONSE.set(response);
+    }
+
+    /**
+     * set current request
+     */
+    public static void setCurrentRequest(Request request) {
+        REQUEST.set(request);
+    }
+
+    public static Response currentResponse() {
+        return RESPONSE.get();
+    }
+
+    public static Request currentRequest() {
+        return REQUEST.get();
+    }
     /**
      * remove current session
      */
     public static void remove() {
-        SESSIONS.remove();
+        SESSION.remove();
+        REQUEST.remove();
+        RESPONSE.remove();
     }
 
 }

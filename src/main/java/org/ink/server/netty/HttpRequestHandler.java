@@ -2,7 +2,6 @@ package org.ink.server.netty;
 
 import org.ink.exception.UnauthorizedException;
 import org.ink.web.WebContext;
-import org.ink.web.http.HttpResponseBuilder;
 import org.ink.web.http.Request;
 import org.ink.web.http.Response;
 import org.ink.web.route.Route;
@@ -15,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * the handling process of the request
  *
  * @author zhuyichen  2017/7/11.
  */
@@ -36,42 +36,26 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
         log.info("Request [{}]", fullHttpRequest.uri());
 
-        /**
-         * build the request
-         * if is the first request then create the session
-         */
+
         Request request = new Request(channelHandlerContext.channel(), fullHttpRequest);
+        WebContext.setCurrentRequest(request);
 
 
-        /**
-         *
-         * TODO
-         *
-         * 怎么传递set-cookie头。。。。。。。。。。。
-         * 。。。。。。。。。。。。。。。
-         * 。。。。。。。。。。。。。。。。。
-         * 。。。。。。。。。。。。。。。。。
-         * 。。。。。。。。。。。。。。。。。。
-         *
-         *
-         *
-         */
-        //set current session
-        WebContext.setCurrentSession(request.getSession());
+        Response preparedResponse = new Response(request);
+        WebContext.setCurrentResponse(preparedResponse);
 
-        Response preparedResponse = new Response(channelHandlerContext.channel(), request);
 
         Route route = null;
         try {
-            route = RouteFinder.findRoute(fullHttpRequest);
+            route = RouteFinder.findRoute(request);
             if (route == null) {
-                HttpResponse exceptionResponse = HttpResponseBuilder.build(HttpResponseStatus.NOT_FOUND);
+                HttpResponse exceptionResponse = Response.buildDefaultFullHttpResponse(HttpResponseStatus.NOT_FOUND);
                 channelHandlerContext.write(exceptionResponse);
                 return;
             }
             RouteSetter.routeSetter(route, fullHttpRequest);
         } catch (UnauthorizedException ignored) {
-            HttpResponse exceptionResponse = HttpResponseBuilder.build(HttpResponseStatus.UNAUTHORIZED);
+            HttpResponse exceptionResponse = Response.buildDefaultFullHttpResponse(HttpResponseStatus.UNAUTHORIZED);
             channelHandlerContext.write(exceptionResponse);
             return;
         }
@@ -93,14 +77,13 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             if (o instanceof Response) {
                 preparedResponse = Response.mergeResponse(preparedResponse, (Response) o);
             } else {
-                preparedResponse.setResponseEntity(o);
+                preparedResponse.setBody(o);
                 preparedResponse.setResponseStatus(HttpResponseStatus.OK);
             }
-            log.info("Response {{}}", preparedResponse.getResponseEntity());
+            log.info("Response {{}}", preparedResponse.body());
         }
 
-
-        FullHttpResponse response = HttpResponseBuilder.build(channelHandlerContext.channel(), preparedResponse);
+        FullHttpResponse response = Response.buildDefaultFullHttpResponse0();
         channelHandlerContext.write(response);
 
     }
@@ -109,6 +92,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
     @Override
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         ctx.flush();
+        WebContext.remove();
     }
 
     @Override
@@ -116,4 +100,10 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         ctx.close();
     }
 
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        ctx.writeAndFlush(Response.buildDefaultFullHttpResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR));
+        cause.printStackTrace();
+        WebContext.remove();
+    }
 }

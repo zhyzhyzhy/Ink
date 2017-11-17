@@ -2,6 +2,7 @@ package org.ink.web.http;
 
 import io.netty.channel.Channel;
 import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import org.ink.web.WebContext;
 import org.slf4j.Logger;
@@ -19,51 +20,57 @@ public class Request {
 
     private FullHttpRequest fullHttpRequest;
 
+    private HttpMethod method;
+
     private Channel channel;
 
-    private HttpSession session;
+    //key -> value
+    private Map<String, String> cookies = new HashMap<>();
 
-    //key -> Cookie
-    private Map<String, Cookie> cookies = new HashMap<>();
-
+    public Request() {}
     public Request(Channel channel, FullHttpRequest fullHttpRequest) {
         this.fullHttpRequest = fullHttpRequest;
         this.channel = channel;
-        //get cookie and set session
-        parseSession();
+        this.method = fullHttpRequest.method();
+        //get cookie
+        parseCookie();
     }
 
-    private void parseSession() {
+    private void parseCookie() {
         //use ServerCookieDecoder to decode cookies in headers
         if (fullHttpRequest.headers().contains("Cookie")) {
-            ServerCookieDecoder.STRICT.decode(fullHttpRequest.headers().get("Cookie"))
-                    .forEach(cookie -> cookies.putIfAbsent(cookie.name(), new Cookie(cookie.name(), cookie.value())));
+
+            Cookie.decode(fullHttpRequest.headers().get("Cookie"))
+                    .forEach(cookie -> {
+                        cookies.putIfAbsent(cookie.name(), cookie.value());
+                    });
         }
 
-        Cookie sessionId = cookies.getOrDefault("sessionid", null);
-
-        if (sessionId == null) {
-            String sessionid = SessionManager.createSessionId();
-            SessionManager.addSession(sessionid, channel);
-            session = SessionManager.getSession(sessionid);
-        }
-        else {
-            session = SessionManager.getSession(sessionId.getValue());
-        }
     }
 
 
-    public Map<String, Cookie> cookies() {
+    public HttpMethod method() {
+        return method;
+    }
+
+    public Channel channel() {
+        return channel;
+    }
+
+    public Map<String, String> cookies() {
         return cookies;
+    }
+
+    public boolean containsCookie(String name) {
+        return cookies.containsKey(name);
+    }
+
+    public String getCookie(String name) {
+        return cookies.get(name);
     }
 
     public String uri() {
         return fullHttpRequest.uri();
-    }
-
-
-    public HttpSession getSession() {
-        return session;
     }
 
 }

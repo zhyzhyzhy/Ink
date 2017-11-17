@@ -27,7 +27,7 @@ public class HelloController {
         return Response
                 .status(HttpResponseStatus.OK)
                 .body(Collections.singletonMap(name, password))
-                .header(HttpHeader.ContentType, "application/json")
+                .header(HttpHeader.CONTENT_TYPE, "application/json")
                 .build();
 
     }
