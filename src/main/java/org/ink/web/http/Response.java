@@ -259,6 +259,7 @@ public class Response {
         for (String head : currentResponse.headers.keySet()) {
             response.headers().add(head, currentResponse.headers.get(head));
         }
+        response.headers().add(HttpHeader.SERVER, "Ink");
         return response;
     }
 
@@ -297,6 +298,8 @@ public class Response {
         }
         fullHttpResponse.headers().set(HttpHeader.CONNECTION, "keep-alive");
         fullHttpResponse.headers().add("Content-Length", fullHttpResponse.content().array().length);
+
+        fullHttpResponse.headers().add(HttpHeader.SERVER, "Ink");
 
         return fullHttpResponse;
     }
