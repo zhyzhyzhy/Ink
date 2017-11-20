@@ -1,5 +1,8 @@
 package org.ink.server.netty;
 
+import io.netty.channel.ChannelFuture;
+import io.netty.handler.stream.ChunkedFile;
+import io.netty.handler.stream.ChunkedInput;
 import org.ink.exception.UnauthorizedException;
 import org.ink.web.WebContext;
 import org.ink.web.http.Request;
@@ -29,6 +32,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, FullHttpRequest fullHttpRequest) throws Exception {
+
 
         if (fullHttpRequest == null) {
             return;
@@ -76,6 +80,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
             if (o instanceof Response) {
                 preparedResponse = Response.mergeResponse(preparedResponse, (Response) o);
+                WebContext.setCurrentResponse(preparedResponse);
             } else {
                 preparedResponse.setBody(o);
                 preparedResponse.setResponseStatus(HttpResponseStatus.OK);
@@ -83,8 +88,11 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             log.info("Response {{}}", preparedResponse.body());
         }
 
-        FullHttpResponse response = Response.buildDefaultFullHttpResponse0();
+        HttpResponse response = Response.buildDefaultFullHttpResponse0();
         channelHandlerContext.write(response);
+        if (WebContext.currentResponse().file() != null) {
+            channelHandlerContext.write(new HttpChunkedInput(new ChunkedFile(WebContext.currentResponse().file())));
+        }
 
     }
 

@@ -1,6 +1,7 @@
 package org.ink.server.netty;
 
 
+import io.netty.util.concurrent.Promise;
 import org.ink.web.route.Route;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
@@ -21,6 +22,7 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
         this.list = list;
     }
 
+
     @Override
     protected void initChannel(SocketChannel socketChannel) throws Exception {
         socketChannel.pipeline().addLast(
@@ -32,3 +34,5 @@ public class HttpChannelInitializer extends ChannelInitializer<SocketChannel> {
         );
     }
 }
+
+

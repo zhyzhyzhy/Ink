@@ -6,7 +6,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 /**
  * @author zhuyichen 2017-11-17
  */
-public final class HttpKit {
+final class HttpKit {
 
     private static final SessionIdGenerator SESSION_ID_GENERATOR = new SessionIdGenerator();
 
@@ -15,7 +15,7 @@ public final class HttpKit {
      *
      * @return unique id
      */
-    public static String createUniqueId() {
+    static String createUniqueId() {
         return SESSION_ID_GENERATOR.generateSessionId();
     }
 

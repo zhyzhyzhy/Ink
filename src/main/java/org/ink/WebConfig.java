@@ -48,7 +48,7 @@ public class WebConfig {
             InputStreamReader reader = new InputStreamReader(inputStream);
             properties.load(reader);
         } catch (Exception e) {
-            log.info("No Config File Mode");
+            log.info("No Config FILE Mode");
         }
     }
 

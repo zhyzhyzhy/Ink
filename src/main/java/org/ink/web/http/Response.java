@@ -2,16 +2,17 @@ package org.ink.web.http;
 
 import com.alibaba.fastjson.JSON;
 import io.netty.buffer.Unpooled;
+import io.netty.buffer.UnpooledDirectByteBuf;
 import io.netty.channel.Channel;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpVersion;
+import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.ink.web.WebContext;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -47,13 +48,23 @@ public class Response {
      */
     private Set<Cookie> cookies;
 
+    /**
+     * if need to transfer file
+     * lazy init
+     */
+    private RandomAccessFile file;
+
+    public RandomAccessFile file() {
+        return file;
+    }
+
     public Response() {
 
     }
 
     public Response(Request request) {
         if (request.cookies() != null) {
-            String sessionId = request.cookies().getOrDefault("sessionid", null);
+            String sessionId = request.cookies().getOrDefault("SESSIONID", null);
             HttpSession session = null;
             //if sessionid is null or Manager not contains sessionid
             //then create one new http session
@@ -61,7 +72,7 @@ public class Response {
                 sessionId = SessionManager.createSessionId();
                 SessionManager.addSession(sessionId, request.channel());
                 session = SessionManager.getSession(sessionId);
-                addCookie("sessionid", sessionId);
+                addCookie("SESSIONID", sessionId);
             } else {
                 session = SessionManager.getSession(sessionId);
                 //if session hasExpired
@@ -69,7 +80,7 @@ public class Response {
                     sessionId = SessionManager.createSessionId();
                     SessionManager.addSession(sessionId, request.channel());
                     session = SessionManager.getSession(sessionId);
-                    addCookie("sessionid", sessionId);
+                    addCookie("SESSIONID", sessionId);
                 }
             }
             //set to WebContext
@@ -121,6 +132,14 @@ public class Response {
         this.cookies = cookies;
     }
 
+    private Response(Object body, HttpResponseStatus responseStatus, Map<String, String> headers, Set<Cookie> cookies, RandomAccessFile file) {
+        this.body = body;
+        this.responseStatus = responseStatus;
+        this.headers = headers;
+        this.cookies = cookies;
+        this.file = file;
+    }
+
 
     /**
      * get and set response body
@@ -168,6 +187,7 @@ public class Response {
         private Object body;
         private Map<String, String> headers;
         private Set<Cookie> cookies;
+        private RandomAccessFile file;
 
         public Builder(HttpResponseStatus status) {
             this.status = status;
@@ -183,7 +203,12 @@ public class Response {
             if (headers != null) {
                 headers.keySet().forEach(s -> map.putIfAbsent(s, headers.get(s)));
             }
-            return new Response(body, status, map, cookies);
+            if (file == null) {
+                return new Response(body, status, map, cookies);
+            }
+            else {
+                return new Response(body, status, map, cookies, file);
+            }
         }
 
         public Builder header(String header, String value) {
@@ -199,6 +224,18 @@ public class Response {
                 cookies = new HashSet<>();
             }
             cookies.add(new Cookie(name, value));
+            return this;
+        }
+
+        public Builder file(File file, String name) {
+            if (this.file != null) {
+                file = null;
+            }
+            try {
+                this.file = new RandomAccessFile(file, "r");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return this;
         }
 
@@ -266,14 +303,24 @@ public class Response {
     /**
      * convert response to DefaultFullHttpResponse
      */
-    public DefaultFullHttpResponse buildDefaultFullHttpResponse() {
-        DefaultFullHttpResponse fullHttpResponse = null;
+    public HttpResponse buildDefaultFullHttpResponse() throws IOException {
+        DefaultHttpResponse fullHttpResponse = null;
 
+        int length = 0;
         //set body
-        if (this.body() == null) {
-            fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, this.responseStatus());
+        if (this.body() == null && this.file == null) {
+            fullHttpResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, this.responseStatus());
         } else {
-            fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, this.responseStatus(), Unpooled.copiedBuffer(JSON.toJSONString(body()).getBytes()));
+            if (this.body() != null) {
+                DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, this.responseStatus(), Unpooled.copiedBuffer(JSON.toJSONString(body()).getBytes()));
+                length = response.content().readableBytes();
+                fullHttpResponse = response;
+            }
+            else {
+                //http file
+                fullHttpResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, this.responseStatus());
+
+            }
         }
 
         //set headers
@@ -284,7 +331,7 @@ public class Response {
         //set content type if has not been done
         if (!fullHttpResponse.headers().contains("Content-type")) {
             if (body instanceof String) {
-                fullHttpResponse.headers().set(HttpHeader.CONTENT_TYPE, "html/text");
+                fullHttpResponse.headers().set(HttpHeader.CONTENT_TYPE, "text/plain");
             } else {
                 fullHttpResponse.headers().set(HttpHeader.CONTENT_TYPE, "application/json;charset=utf-8");
             }
@@ -297,14 +344,17 @@ public class Response {
                     .collect(Collectors.toList()));
         }
         fullHttpResponse.headers().set(HttpHeader.CONNECTION, "keep-alive");
-        fullHttpResponse.headers().add("Content-Length", fullHttpResponse.content().array().length);
-
-        fullHttpResponse.headers().add(HttpHeader.SERVER, "Ink");
-
+        if (this.file != null) {
+            fullHttpResponse.headers().set(HttpHeader.CONTENT_LENGTH, length + this.file.length());
+        }
+        else {
+            fullHttpResponse.headers().set(HttpHeader.CONTENT_LENGTH, length);
+        }
+//        fullHttpResponse.headers().set(HttpHeader.SERVER, "Ink");
         return fullHttpResponse;
     }
 
-    public static DefaultFullHttpResponse buildDefaultFullHttpResponse0() {
+    public static HttpResponse buildDefaultFullHttpResponse0() throws IOException{
         return WebContext.currentResponse().buildDefaultFullHttpResponse();
     }
 

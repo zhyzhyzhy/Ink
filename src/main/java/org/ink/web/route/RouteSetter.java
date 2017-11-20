@@ -4,9 +4,7 @@ import com.alibaba.fastjson.JSON;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.QueryStringDecoder;
-import io.netty.handler.codec.http.multipart.Attribute;
-import io.netty.handler.codec.http.multipart.HttpPostRequestDecoder;
-import io.netty.handler.codec.http.multipart.InterfaceHttpData;
+import io.netty.handler.codec.http.multipart.*;
 import io.netty.util.CharsetUtil;
 import org.ink.exception.UnauthorizedException;
 import org.ink.security.JwtInfo;
@@ -15,10 +13,11 @@ import org.ink.web.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.io.*;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +52,11 @@ public final class RouteSetter {
         if ("application/json".equals(fullHttpRequest.headers().get("content-Type"))) {
             routeRequestJsonSetter(fullHttpRequest.content().copy().toString(CharsetUtil.UTF_8), route);
         }
+
+        //设置@FILE
+        if (fullHttpRequest.headers().get("content-Type") != null && fullHttpRequest.headers().get("content-Type").startsWith("multipart/form-data")) {
+            fileSetter(fullHttpRequest, route);
+        }
     }
 
     //处理@RequestJson参数
@@ -72,6 +76,35 @@ public final class RouteSetter {
         }
     }
 
+    public static void fileSetter(FullHttpRequest request, Route route) {
+        try {
+            HttpPostMultipartRequestDecoder decoder = new HttpPostMultipartRequestDecoder(request);
+            Map<String, File> map = new HashMap<>();
+
+            for (InterfaceHttpData httpData : decoder.getBodyHttpDatas()) {
+                if ("FileUpload".equals(httpData.getHttpDataType().name())) {
+                    FileUpload fileUpload = (FileUpload)httpData;
+                    map.put(httpData.getName(), fileUpload.getFile());
+                }
+            }
+            Method method = route.getMethod();
+            Parameter[] parameters = method.getParameters();
+            for (int i = 0; i < parameters.length; i++) {
+                Annotation[] annotations = parameters[i].getAnnotations();
+                for (Annotation annotation : annotations) {
+                    if (annotation instanceof FILE) {
+                        //得到参数的类
+                        if (map.containsKey(parameters[i].getName())) {
+                            //根据名字set
+                            route.getParamters()[i] = map.get(parameters[i].getName());
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
     //处理@PathVariable参数
     public static void routePathVariableSetter(String path, Route route) {
