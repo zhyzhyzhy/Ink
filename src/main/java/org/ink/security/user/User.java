@@ -1,4 +1,4 @@
-package org.ink.security;
+package org.ink.security.user;
 
 import java.util.List;
 

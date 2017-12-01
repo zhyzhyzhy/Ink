@@ -1,9 +1,8 @@
 package org.ink.web.route;
 
 
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpMethod;
-import org.ink.exception.UnauthorizedException;
+import org.ink.security.exception.UnauthorizedException;
 import org.ink.web.annotation.PathVariable;
 import org.ink.web.http.Request;
 
@@ -39,7 +38,6 @@ public class RouteFinder {
                 //如果是数字
                 else if (parameter.getType() == Integer.class
                         || parameter.getType() == Long.class) {
-                    System.out.println(parameter.getName());
                     path = path.replace("{" + parameter.getName() + "}", "[0-9]*");
                 }
 
@@ -78,7 +76,7 @@ public class RouteFinder {
                 Route route = routeMap.get(pattern);
 
                 //如果请求方式一样
-                if (route.getHttpMethod().equals(method)) {
+                if (route.httpMethod().equals(method)) {
 
                     return route;
                 }

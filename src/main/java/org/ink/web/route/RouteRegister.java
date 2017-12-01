@@ -70,6 +70,10 @@ public class RouteRegister {
 
                     if (annotation instanceof Role) {
                         isSecurity = true;
+                        Role role = (Role)annotation;
+                        for (String s : role.value()) {
+                            route.addRolePermit(s);
+                        }
                     }
 
                 }
@@ -81,7 +85,7 @@ public class RouteRegister {
 
                 //如果已经有这个路由
                 if (routes.contains(route)) {
-                    log.error("route {} has contained", route.getPath());
+                    log.error("route {} has contained", route.path());
                 }
                 else {
 
@@ -90,11 +94,11 @@ public class RouteRegister {
                     routes.add(route);
                     route.setParamters(new Object[method.getParameterCount()]);
                     RouteFinder.addRouter(RouteFinder.pathCompiler(path, method), route);
-                    if (route.isSecurity()) {
-                        log.info("mapping {} [{}] with roles [{}]", route.getHttpMethod(), route.getPath(), method.getAnnotation(Role.class).value());
+                    if (route.security()) {
+                        log.info("mapping {} [{}] with roles [{}]", route.httpMethod(), route.path(), method.getAnnotation(Role.class).value());
                     }
                     else {
-                        log.info("mapping {} [{}] with roles [all]", route.getHttpMethod(), route.getPath());
+                        log.info("mapping {} [{}] with roles [all]", route.httpMethod(), route.path());
                     }
                 }
             }

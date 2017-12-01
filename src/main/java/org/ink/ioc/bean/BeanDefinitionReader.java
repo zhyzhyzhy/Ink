@@ -47,7 +47,6 @@ public class BeanDefinitionReader {
 //                log.info("package {} is being scan", beanPackage);
 //                addPackageToScan(beanPackage);
 //            }
-            log.info(configureClass.getPackage().getName());
             addPackageToScan(configureClass.getPackage().getName());
         } catch (Exception e) {
             log.info("class {} did't implements NoNameConfigure.class", configureClass);

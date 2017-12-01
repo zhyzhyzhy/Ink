@@ -1,5 +1,6 @@
 package org.ink;
 
+import org.apache.commons.lang3.SystemUtils;
 import org.ink.aop.ProxyManager;
 import org.ink.db.MybatisConfig;
 import org.ink.ioc.IocContext;
@@ -24,6 +25,11 @@ public class Ink {
     private IocContext iocContext;
     private List<Route> routes;
 
+    static {
+        log.info("OS           : {}", SystemUtils.OS_ARCH);
+        log.info("JAVA_HOME    : {}", SystemUtils.JAVA_HOME);
+        log.info("JDK_VERSION  : {}", SystemUtils.JAVA_VERSION);
+    }
     public Ink(int port, Class<?> configure) {
         inkServer = new InkServer(port);
         iocContext = new IocContext(configure);

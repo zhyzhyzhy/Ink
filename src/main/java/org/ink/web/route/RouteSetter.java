@@ -6,8 +6,8 @@ import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.QueryStringDecoder;
 import io.netty.handler.codec.http.multipart.*;
 import io.netty.util.CharsetUtil;
-import org.ink.exception.UnauthorizedException;
-import org.ink.security.JwtInfo;
+import org.ink.security.exception.UnauthorizedException;
+import org.ink.security.CheckResult;
 import org.ink.security.SecurityManager;
 import org.ink.web.annotation.*;
 import org.slf4j.Logger;
@@ -25,25 +25,25 @@ public final class RouteSetter {
 
     private static final Logger logger = LoggerFactory.getLogger(RouteSetter.class);
 
-    public static void routeSetter(Route route, FullHttpRequest fullHttpRequest) throws UnauthorizedException {
+    public static void routeSetter(Route route, FullHttpRequest fullHttpRequest) throws Exception {
         String path = fullHttpRequest.uri();
         HttpMethod method = fullHttpRequest.method();
 
 
-        if (route.isSecurity()) {
-            JwtInfo jwtInfo = SecurityManager.check(fullHttpRequest, route);
-            if (!jwtInfo.isOk()) {
-                throw new UnauthorizedException();
+        if (route.security()) {
+            CheckResult checkResult = SecurityManager.check(route);
+            if (!checkResult.isOk()) {
+                throw checkResult.exception();
             }
         }
 
         //设置@PathVariable
         routePathVariableSetter(path, route);
 
-        if (route.getHttpMethod().equals(HttpMethod.GET)) {
+        if (route.httpMethod().equals(HttpMethod.GET)) {
             //设置GET @RequestParam
             GETParamsSetter(path, route);
-        } else if (route.getHttpMethod().equals(HttpMethod.POST)) {
+        } else if (route.httpMethod().equals(HttpMethod.POST)) {
             //设置POST @RequestParam
             POSTParamsSetter(fullHttpRequest, route);
         }

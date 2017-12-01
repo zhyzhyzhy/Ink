@@ -1,17 +1,19 @@
 package org.ink.server.netty;
 
-import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.HttpChunkedInput;
+import io.netty.handler.codec.http.HttpResponse;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.stream.ChunkedFile;
-import io.netty.handler.stream.ChunkedInput;
-import org.ink.exception.UnauthorizedException;
+import org.ink.security.exception.ForbiddenException;
+import org.ink.security.exception.UnauthorizedException;
 import org.ink.web.WebContext;
 import org.ink.web.http.Request;
 import org.ink.web.http.Response;
 import org.ink.web.route.Route;
 import org.ink.web.route.RouteFinder;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.*;
 import org.ink.web.route.RouteSetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,24 +60,23 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 return;
             }
             RouteSetter.routeSetter(route, fullHttpRequest);
-        } catch (UnauthorizedException ignored) {
-            HttpResponse exceptionResponse = Response.buildDefaultFullHttpResponse(HttpResponseStatus.UNAUTHORIZED);
-            channelHandlerContext.write(exceptionResponse);
+        } catch (Exception e) {
+            handleException(channelHandlerContext, e);
             return;
         }
 
         Boolean continueProcess = true;
         //before aop
-        if (route.getBeforeProxyChain().size() != 0) {
-            continueProcess = route.getBeforeProxyChain().doChain(request, preparedResponse, route);
+        if (route.beforeProxyChain().size() != 0) {
+            continueProcess = route.beforeProxyChain().doChain(request, preparedResponse, route);
         }
 
         if (continueProcess) {
             Object o = route.getMethod().invoke(route.getObject(), route.getParamters());
 
             //after aop
-            if (route.getAfterProxyChain().size() != 0) {
-                route.getAfterProxyChain().doChain(request, preparedResponse, route);
+            if (route.afterProxyChain().size() != 0) {
+                route.afterProxyChain().doChain(request, preparedResponse, route);
             }
 
             if (o instanceof Response) {
@@ -113,5 +114,17 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         ctx.writeAndFlush(Response.buildDefaultFullHttpResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR));
         cause.printStackTrace();
         WebContext.remove();
+    }
+
+    private void handleException(ChannelHandlerContext ctx, Exception e) {
+        if (e instanceof UnauthorizedException) {
+            ctx.write(Response.buildDefaultFullHttpResponse(HttpResponseStatus.UNAUTHORIZED));
+        }
+        else if (e instanceof ForbiddenException) {
+            ctx.write(Response.buildDefaultFullHttpResponse(HttpResponseStatus.FORBIDDEN));
+        }
+        else {
+            ctx.write(Response.buildDefaultFullHttpResponse(HttpResponseStatus.INTERNAL_SERVER_ERROR));
+        }
     }
 }

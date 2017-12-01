@@ -58,6 +58,10 @@ public class Response {
         return file;
     }
 
+    public long fileLength() throws IOException {
+        return file == null ? 0 : file.length();
+    }
+
     public Response() {
 
     }
@@ -205,8 +209,7 @@ public class Response {
             }
             if (file == null) {
                 return new Response(body, status, map, cookies);
-            }
-            else {
+            } else {
                 return new Response(body, status, map, cookies, file);
             }
         }
@@ -315,8 +318,7 @@ public class Response {
                 DefaultFullHttpResponse response = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, this.responseStatus(), Unpooled.copiedBuffer(JSON.toJSONString(body()).getBytes()));
                 length = response.content().readableBytes();
                 fullHttpResponse = response;
-            }
-            else {
+            } else {
                 //http file
                 fullHttpResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, this.responseStatus());
 
@@ -344,17 +346,12 @@ public class Response {
                     .collect(Collectors.toList()));
         }
         fullHttpResponse.headers().set(HttpHeader.CONNECTION, "keep-alive");
-        if (this.file != null) {
-            fullHttpResponse.headers().set(HttpHeader.CONTENT_LENGTH, length + this.file.length());
-        }
-        else {
-            fullHttpResponse.headers().set(HttpHeader.CONTENT_LENGTH, length);
-        }
-//        fullHttpResponse.headers().set(HttpHeader.SERVER, "Ink");
+        fullHttpResponse.headers().set(HttpHeader.CONTENT_LENGTH, length + fileLength());
+        fullHttpResponse.headers().set(HttpHeader.SERVER, "Ink");
         return fullHttpResponse;
     }
 
-    public static HttpResponse buildDefaultFullHttpResponse0() throws IOException{
+    public static HttpResponse buildDefaultFullHttpResponse0() throws IOException {
         return WebContext.currentResponse().buildDefaultFullHttpResponse();
     }
 

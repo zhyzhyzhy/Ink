@@ -1,13 +1,15 @@
 package org.ink.security;
 
+import io.netty.handler.codec.http.HttpResponseStatus;
 import org.ink.WebConfig;
 import org.ink.db.Service;
 import org.ink.ioc.bean.BeanDefinition;
 import org.ink.ioc.IocContext;
-import org.ink.security.annotation.Role;
 import org.ink.security.annotation.UserDetail;
+import org.ink.security.user.User;
+import org.ink.security.user.UserDetailService;
+import org.ink.web.WebContext;
 import org.ink.web.route.Route;
-import io.netty.handler.codec.http.FullHttpRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,13 +34,13 @@ public class SecurityManager {
             Class<?> clazz = beanDefinition.getObject().getClass();
             if (clazz.getAnnotation(Service.class) != null) {
                 Class superclass = clazz.getSuperclass();
+                //如果实现了UserDetailService接口的，就作为一个登陆选项
                 if (superclass.equals(UserDetailService.class)) {
                     roleDetails.add((UserDetailService) beanDefinition.getObject());
                 }
             }
         }
 
-        Object ob = iocContext.getBean(configureclass);
         if (WebConfig.SECURITY_KEY != null) {
             iocContext.registerBean(new AuthenticationRoutes());
             SecurityConfig.KEY = WebConfig.SECURITY_KEY;
@@ -48,7 +50,7 @@ public class SecurityManager {
 
     }
 
-    public static User login(String userName, String password) {
+    static User login(String userName, String password) {
 
         User currentUser = null;
         for (UserDetailService roleDetails : roleDetails) {
@@ -60,34 +62,21 @@ public class SecurityManager {
         return currentUser;
     }
 
-    public static JwtInfo check(FullHttpRequest fullHttpRequest, Route route) {
-
-        String jwtString = fullHttpRequest.headers().get("Authorization");
-        if (jwtString == null || !JwtUtil.validateToken(jwtString)) {
-            return new JwtInfo(false);
+    public static CheckResult check(Route route) {
+        if (WebContext.currentSession().user() == null) {
+            return new CheckResult(HttpResponseStatus.UNAUTHORIZED);
         }
-
-        User currentUser = JwtUtil.getUserFromToken(jwtString);
-
-        Role role = route.getMethod().getAnnotation(Role.class);
-        String[] permitRoles = role.value();
-
-//        System.out.println(currentUser.getUserName());
-        for (String role1 : currentUser.getRoles()) {
-//            System.out.println(role1);
-            for (String role2 : permitRoles) {
-                if (role1.equals(role2)) {
-                    UserDetailSetter(route, currentUser);
-                    return new JwtInfo(true);
-                }
-            }
+        User user = WebContext.currentSession().user();
+        if (route.containsRolesAll(user.getRoles())) {
+            return new CheckResult(true);
         }
-
-        return new JwtInfo(false);
+        else {
+            return new CheckResult(HttpResponseStatus.FORBIDDEN);
+        }
 
     }
 
-    public static void UserDetailSetter(Route route, User user) {
+    static void UserDetailSetter(Route route, User user) {
         Parameter[] parameters = route.getMethod().getParameters();
         for (int i = 0; i < parameters.length; i++) {
             for (Annotation annotation : parameters[i].getAnnotations()) {

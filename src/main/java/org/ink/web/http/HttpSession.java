@@ -1,7 +1,7 @@
 package org.ink.web.http;
 
 import io.netty.channel.Channel;
-import org.ink.security.User;
+import org.ink.security.user.User;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -85,7 +85,7 @@ public class HttpSession {
     /**
      * lazy init attributes
      */
-    public void addAttribute(String key, String value) {
+    public void addAttribute(String key, Object value) {
         if (attributes == null) {
             attributes = new HashMap<>();
         }

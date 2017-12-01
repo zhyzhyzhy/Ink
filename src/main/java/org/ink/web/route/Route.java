@@ -1,33 +1,63 @@
 package org.ink.web.route;
 
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.ink.aop.ChainType;
 import org.ink.aop.ProxyChain;
 import io.netty.handler.codec.http.HttpMethod;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
- * Created by zhuyichen on 2017/7/12.
+ * @author zhuyichen 2017-7-12
  */
 public class Route {
-    //方法所在的对象
+
+    //the object that method in
     private Object object;
-    //方法
+
+    //the method
     private Method method;
-    //请求的方法
+
+    //the request method GET, POST, PUT, DELETE
     private HttpMethod httpMethod;
-    //请求的路径
+
+    //the request path
     private String path;
-    //是否有role注解
+
+    //is has @Role annotation
     private boolean security = false;
+
+    //if has @Role annotation, contains roles
+    private Set<String> roles;
+
+    public void addRolePermit(String roleName) {
+        if (roles == null) {
+            roles = new HashSet<>();
+        }
+        roles.add(roleName);
+    }
+
+    public boolean containsRole(String roleName) {
+        return roles != null && roles.contains(roleName);
+    }
+
+    public boolean containsRolesAll(List<String> roleNames) {
+        return roles != null && roles.containsAll(roleNames);
+    }
 
     //Aop的前置路由
     private ProxyChain beforeProxyChain = new ProxyChain(ChainType.BEFORE);
     //Aop的后置路由
     private ProxyChain afterProxyChain = new ProxyChain(ChainType.AFTER);
 
-    public ProxyChain getBeforeProxyChain() {
+    public ProxyChain beforeProxyChain() {
         return beforeProxyChain;
     }
 
@@ -35,7 +65,7 @@ public class Route {
         this.beforeProxyChain = beforeProxyChain;
     }
 
-    public ProxyChain getAfterProxyChain() {
+    public ProxyChain afterProxyChain() {
         return afterProxyChain;
     }
 
@@ -43,7 +73,7 @@ public class Route {
         this.afterProxyChain = afterProxyChain;
     }
 
-    public boolean isSecurity() {
+    public boolean security() {
         return security;
     }
 
@@ -74,7 +104,7 @@ public class Route {
         this.path = path;
     }
 
-    public HttpMethod getHttpMethod() {
+    public HttpMethod httpMethod() {
         return httpMethod;
     }
 
@@ -82,7 +112,7 @@ public class Route {
         this.httpMethod = httpMethod;
     }
 
-    public String getPath() {
+    public String path() {
         return path;
     }
 
@@ -105,29 +135,48 @@ public class Route {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
+
         if (o == null || getClass() != o.getClass()) return false;
 
         Route route = (Route) o;
 
-        if (httpMethod != null ? !httpMethod.equals(route.httpMethod) : route.httpMethod != null) return false;
-        return path != null ? path.equals(route.path) : route.path == null;
+        return new EqualsBuilder()
+                .append(security, route.security)
+                .append(object, route.object)
+                .append(method, route.method)
+                .append(httpMethod, route.httpMethod)
+                .append(path, route.path)
+                .append(beforeProxyChain, route.beforeProxyChain)
+                .append(afterProxyChain, route.afterProxyChain)
+                .append(paramters, route.paramters)
+                .isEquals();
     }
 
     @Override
     public int hashCode() {
-        int result = 0;
-        result = 31 * result + (method != null ? method.hashCode() : 0);
-        result = 31 * result + (path != null ? path.hashCode() : 0);
-        return result;
+        return new HashCodeBuilder(17, 37)
+                .append(object)
+                .append(method)
+                .append(httpMethod)
+                .append(path)
+                .append(security)
+                .append(beforeProxyChain)
+                .append(afterProxyChain)
+                .append(paramters)
+                .toHashCode();
     }
 
     @Override
     public String toString() {
-        return "Router{" +
-                "object=" + object +
-                ", method=" + method +
-                ", httpMethod=" + httpMethod +
-                ", path='" + path + '\'' +
-                '}';
+        return new ToStringBuilder(this)
+                .append("object", object)
+                .append("method", method)
+                .append("httpMethod", httpMethod)
+                .append("path", path)
+                .append("security", security)
+                .append("beforeProxyChain", beforeProxyChain)
+                .append("afterProxyChain", afterProxyChain)
+                .append("paramters", paramters)
+                .toString();
     }
 }

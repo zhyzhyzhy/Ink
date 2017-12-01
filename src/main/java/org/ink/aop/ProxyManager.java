@@ -97,15 +97,15 @@ public class ProxyManager {
     private static void registerProxyChains(List<Route> routes) {
         routes.forEach(route -> {
             beforeMap.forEach((pattern, proxyEntity) -> {
-                if (pattern.matcher(route.getPath()).matches()) {
-                    route.getBeforeProxyChain().addProxyEntity(proxyEntity);
+                if (pattern.matcher(route.path()).matches()) {
+                    route.beforeProxyChain().addProxyEntity(proxyEntity);
                     log.info("add beforeAop {} to route {}", proxyEntity, route);
                 }
             });
 
             afterMap.forEach((pattern, proxyEntity) -> {
-                if (pattern.matcher(route.getPath()).matches()) {
-                    route.getAfterProxyChain().addProxyEntity(proxyEntity);
+                if (pattern.matcher(route.path()).matches()) {
+                    route.afterProxyChain().addProxyEntity(proxyEntity);
                     log.info("add afterAop {} to route {}", proxyEntity, route);
                 }
             });
