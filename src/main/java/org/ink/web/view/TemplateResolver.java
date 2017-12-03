@@ -5,5 +5,5 @@ import java.util.Map;
 
 public interface TemplateResolver {
 
-    RandomAccessFile resolve(String name, Map<String, Object> model) throws Exception;
+    RandomAccessFile resolve(String name, Model model) throws Exception;
 }

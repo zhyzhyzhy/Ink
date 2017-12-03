@@ -87,7 +87,7 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
                 WebContext.setCurrentResponse(preparedResponse);
             }
             else if (route.view()) {
-                preparedResponse.setFile(resolver.resolve(o.toString(), null));
+                preparedResponse.setFile(resolver.resolve(o.toString(), preparedResponse.getModel()));
                 preparedResponse.setResponseStatus(HttpResponseStatus.OK);
                 preparedResponse.header(HttpHeader.CONTENT_TYPE, "text/html");
             }

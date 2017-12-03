@@ -9,7 +9,9 @@ import io.netty.util.CharsetUtil;
 import org.ink.security.exception.UnauthorizedException;
 import org.ink.security.CheckResult;
 import org.ink.security.SecurityManager;
+import org.ink.web.WebContext;
 import org.ink.web.annotation.*;
+import org.ink.web.view.Model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,6 +22,8 @@ import java.lang.reflect.Parameter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static org.ink.web.route.RouteSetter.modelSetter;
 
 public final class RouteSetter {
 
@@ -57,6 +61,25 @@ public final class RouteSetter {
         if (fullHttpRequest.headers().get("content-Type") != null && fullHttpRequest.headers().get("content-Type").startsWith("multipart/form-data")) {
             fileSetter(fullHttpRequest, route);
         }
+
+        //设置model
+        modelSetter(fullHttpRequest, route);
+
+    }
+
+    //处理Model参数
+    public static void modelSetter(FullHttpRequest fullHttpRequest, Route route) {
+        Method method = route.getMethod();
+        Parameter[] parameters = method.getParameters();
+        for (int i = 0; i < parameters.length; i++) {
+            //得到参数的类
+            Class<?> class1 = parameters[i].getType();
+            if (class1.equals(Model.class)) {
+                Model model = new Model();
+                WebContext.currentResponse().setModel(model);
+                route.getParamters()[i] = model;
+            }
+        }
     }
 
     //处理@RequestJson参数
@@ -83,7 +106,7 @@ public final class RouteSetter {
 
             for (InterfaceHttpData httpData : decoder.getBodyHttpDatas()) {
                 if ("FileUpload".equals(httpData.getHttpDataType().name())) {
-                    FileUpload fileUpload = (FileUpload)httpData;
+                    FileUpload fileUpload = (FileUpload) httpData;
                     map.put(httpData.getName(), fileUpload.getFile());
                 }
             }

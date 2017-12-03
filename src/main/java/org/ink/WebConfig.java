@@ -42,6 +42,8 @@ public class WebConfig {
     public static String MYBATIS_CONFIG_FILE_NAME;
     public static String MYBATIS_ENVIRONMENT;
 
+    public static final String PATH = WebConfig.class.getResource("/").getPath();
+
     static {
         try {
             InputStream inputStream = getClassLoader().getResourceAsStream("app.properties");

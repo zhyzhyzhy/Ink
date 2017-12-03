@@ -9,6 +9,7 @@ import io.netty.handler.codec.http.cookie.ServerCookieDecoder;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.ink.web.WebContext;
+import org.ink.web.view.Model;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -55,6 +56,16 @@ public class Response {
      */
     private RandomAccessFile file;
 
+    private Model model;
+
+    public Model getModel() {
+        return model;
+    }
+
+    public void setModel(Model model) {
+        this.model = model;
+    }
+
     public RandomAccessFile file() {
         return file;
     }
@@ -62,7 +73,7 @@ public class Response {
     public void setFile(RandomAccessFile file) {
         this.file = file;
     }
-    public long fileLength() throws IOException {
+    private long fileLength() throws IOException {
         return file == null ? 0 : file.length();
     }
 

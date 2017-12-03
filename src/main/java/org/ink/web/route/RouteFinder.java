@@ -26,7 +26,7 @@ public class RouteFinder {
     public static Pattern pathCompiler(String path, Method method) {
         Parameter[] parameters = method.getParameters();
         for (Parameter parameter : parameters) {
-            if (parameter.getAnnotations() == null) {
+            if (parameter.getAnnotations().length == 0) {
                 continue;
             }
             Annotation annotation = parameter.getAnnotations()[0];
