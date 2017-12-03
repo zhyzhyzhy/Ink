@@ -6,6 +6,10 @@ import org.ink.web.http.HttpHeader;
 import org.ink.web.http.Response;
 import io.netty.handler.codec.http.HttpResponseStatus;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +53,19 @@ public class HelloController {
         return Response.status(HttpResponseStatus.OK).body(id).build();
     }
 
+    @GET("/text")
+    public String getText() {
+        return "hello,world";
+    }
 
+    @GET("/file")
+    public Response uploadFile() {
+        return new Response.Builder(HttpResponseStatus.OK)
+                .header(HttpHeader.CONTENT_TYPE,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+                .file(new File("/Users/zhuyichen/cp.sh"), "hahahahahha.sh")
+                .build();
+    }
 
     public static void main(String[] args) {
 

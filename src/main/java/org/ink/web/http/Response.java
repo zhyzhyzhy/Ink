@@ -11,6 +11,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.ink.web.WebContext;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -58,6 +59,9 @@ public class Response {
         return file;
     }
 
+    public void setFile(RandomAccessFile file) {
+        this.file = file;
+    }
     public long fileLength() throws IOException {
         return file == null ? 0 : file.length();
     }
@@ -321,7 +325,6 @@ public class Response {
             } else {
                 //http file
                 fullHttpResponse = new DefaultHttpResponse(HttpVersion.HTTP_1_1, this.responseStatus());
-
             }
         }
 

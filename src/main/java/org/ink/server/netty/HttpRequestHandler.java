@@ -10,11 +10,13 @@ import io.netty.handler.stream.ChunkedFile;
 import org.ink.security.exception.ForbiddenException;
 import org.ink.security.exception.UnauthorizedException;
 import org.ink.web.WebContext;
+import org.ink.web.http.HttpHeader;
 import org.ink.web.http.Request;
 import org.ink.web.http.Response;
 import org.ink.web.route.Route;
 import org.ink.web.route.RouteFinder;
 import org.ink.web.route.RouteSetter;
+import org.ink.web.view.FreeMarkerResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +28,8 @@ import org.slf4j.LoggerFactory;
 public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
 
     private final Logger log = LoggerFactory.getLogger(HttpRequestHandler.class);
+
+    private FreeMarkerResolver resolver = new FreeMarkerResolver();
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -73,7 +77,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
 
         if (continueProcess) {
             Object o = route.getMethod().invoke(route.getObject(), route.getParamters());
-
             //after aop
             if (route.afterProxyChain().size() != 0) {
                 route.afterProxyChain().doChain(request, preparedResponse, route);
@@ -82,7 +85,13 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
             if (o instanceof Response) {
                 preparedResponse = Response.mergeResponse(preparedResponse, (Response) o);
                 WebContext.setCurrentResponse(preparedResponse);
-            } else {
+            }
+            else if (route.view()) {
+                preparedResponse.setFile(resolver.resolve(o.toString(), null));
+                preparedResponse.setResponseStatus(HttpResponseStatus.OK);
+                preparedResponse.header(HttpHeader.CONTENT_TYPE, "text/html");
+            }
+            else  {
                 preparedResponse.setBody(o);
                 preparedResponse.setResponseStatus(HttpResponseStatus.OK);
             }
@@ -94,7 +103,6 @@ public class HttpRequestHandler extends SimpleChannelInboundHandler<FullHttpRequ
         if (WebContext.currentResponse().file() != null) {
             channelHandlerContext.write(new HttpChunkedInput(new ChunkedFile(WebContext.currentResponse().file())));
         }
-
     }
 
 

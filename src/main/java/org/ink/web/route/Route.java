@@ -34,6 +34,8 @@ public class Route {
     //is has @Role annotation
     private boolean security = false;
 
+    private boolean view = false;
+
     //if has @Role annotation, contains roles
     private Set<String> roles;
 
@@ -42,6 +44,14 @@ public class Route {
             roles = new HashSet<>();
         }
         roles.add(roleName);
+    }
+
+    public void setView() {
+        this.view = true;
+    }
+
+    public boolean view() {
+        return view;
     }
 
     public boolean containsRole(String roleName) {

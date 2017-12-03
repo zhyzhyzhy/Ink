@@ -2,10 +2,7 @@ package org.ink.web.route;
 
 import org.ink.ioc.bean.BeanDefinition;
 import org.ink.security.annotation.Role;
-import org.ink.web.annotation.DELETE;
-import org.ink.web.annotation.GET;
-import org.ink.web.annotation.POST;
-import org.ink.web.annotation.PUT;
+import org.ink.web.annotation.*;
 import io.netty.handler.codec.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,11 +40,11 @@ public class RouteRegister {
 
                 Route route = null;
                 String path = "";
-                boolean isSecurity = false;
+//                boolean isSecurity = false;
+//                boolean isView = false;
                 for (Annotation annotation : annotations) {
 
                     method.setAccessible(true);
-
                     //没想到优化方法。。。暂时先这样了
 
                     if (annotation instanceof GET) {
@@ -66,21 +63,25 @@ public class RouteRegister {
                         route = new Route(beanDefinition.getObject(), method, HttpMethod.DELETE, ((DELETE) annotation).value());
                         path = ((DELETE) annotation).value();
                     }
-
-
-                    if (annotation instanceof Role) {
-                        isSecurity = true;
-                        Role role = (Role)annotation;
-                        for (String s : role.value()) {
-                            route.addRolePermit(s);
-                        }
-                    }
-
                 }
-
 
                 if (route == null) {
                     continue;
+                }
+                else {
+                    for (Annotation annotation : annotations) {
+                        if (annotation instanceof Role) {
+                            Role role = (Role)annotation;
+                            route.setSecurity(true);
+                            for (String s : role.value()) {
+                                route.addRolePermit(s);
+                            }
+                        }
+
+                        if (annotation instanceof View) {
+                            route.setView();
+                        }
+                    }
                 }
 
                 //如果已经有这个路由
@@ -88,9 +89,6 @@ public class RouteRegister {
                     log.error("route {} has contained", route.path());
                 }
                 else {
-
-                    route.setSecurity(isSecurity);
-
                     routes.add(route);
                     route.setParamters(new Object[method.getParameterCount()]);
                     RouteFinder.addRouter(RouteFinder.pathCompiler(path, method), route);
