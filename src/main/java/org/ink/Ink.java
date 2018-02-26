@@ -2,7 +2,7 @@ package org.ink;
 
 import org.apache.commons.lang3.SystemUtils;
 import org.ink.aop.ProxyManager;
-import org.ink.db.MybatisConfig;
+import org.ink.db.mybatis.MybatisConfig;
 import org.ink.ioc.IocContext;
 import org.ink.security.SecurityManager;
 import org.ink.server.InkServer;

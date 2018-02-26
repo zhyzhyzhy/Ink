@@ -2,7 +2,7 @@ package org.ink.security;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 import org.ink.WebConfig;
-import org.ink.db.Service;
+import org.ink.db.annotation.Service;
 import org.ink.ioc.bean.BeanDefinition;
 import org.ink.ioc.IocContext;
 import org.ink.security.annotation.UserDetail;
@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -88,3 +89,4 @@ public class SecurityManager {
     }
 
 }
+

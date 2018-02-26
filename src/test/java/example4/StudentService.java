@@ -1,6 +1,6 @@
 package example4;
 
-import org.ink.db.Service;
+import org.ink.db.annotation.Service;
 import org.ink.ioc.annotation.Inject;
 
 /**

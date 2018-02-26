@@ -3,6 +3,7 @@ package org.ink.example1;
 
 import org.ink.web.annotation.*;
 import org.ink.web.http.Response;
+import org.ink.web.view.Model;
 
 import java.util.Collections;
 import java.util.Map;
@@ -24,5 +25,12 @@ public class IndexController {
     @POST("/student")
     public Response newStudent(@RequestJson Student student) {
         return Response.ok().build();
+    }
+
+    @View
+    @GET("/view")
+    public String getView(Model model) {
+        model.attr("user", "zhuyichen");
+        return "index.ftl";
     }
 }

@@ -1,4 +1,4 @@
-package org.ink.db;
+package org.ink.db.annotation;
 
 
 import java.lang.annotation.ElementType;

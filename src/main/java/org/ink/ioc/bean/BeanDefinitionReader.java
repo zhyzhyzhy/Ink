@@ -2,8 +2,8 @@ package org.ink.ioc.bean;
 
 
 import org.ink.aop.annotation.Proxy;
-import org.ink.db.MybatisConfig;
-import org.ink.db.Service;
+import org.ink.db.mybatis.MybatisConfig;
+import org.ink.db.annotation.Service;
 import org.ink.ioc.annotation.Component;
 import org.ink.ioc.annotation.Inject;
 import org.ink.web.annotation.Controller;
